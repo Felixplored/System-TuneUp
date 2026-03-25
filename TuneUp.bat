@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.4
+title System TuneUp by Felixplored v. 1.5
 echo on
 rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -25,6 +25,8 @@ rd C:\$SysReset /q /s
 rd C:\$Windows.~BT /q /s
 rd C:\$Windows.~WS /q /s
 rd C:\$WinREAgent /q /s
+rd C:\Config.Msi /q /s
+rd C:\Recovery /q /s
 rd C:\Windows.old /q /s
 del C:\PerfLogs /f /q /s
 for /d %%a in ("C:\PerfLogs\*.*") do rd /q /s "%%a"
