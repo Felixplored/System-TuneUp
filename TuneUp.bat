@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.7
+title System TuneUp by Felixplored v. 1.8
 echo on
 rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -73,6 +73,6 @@ set /p auswahl="Moechten Sie das System Neustarten? (y/n)"
 if "%auswahl%" == "y" goto ja
 if "%auswahl%" == "n" goto nein
 :ja
-shutdown /r
+shutdown /r /t 60
 :nein
 exit

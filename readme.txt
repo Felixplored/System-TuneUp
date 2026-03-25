@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v. 1.7
+System TuneUp by Felixplored v. 1.8
 
 Versionshistorie:
+v. 1.8 (17.07.2025) ・ Der Timer für den Neustart wurde auf 1 Minute gesetzt.
 v. 1.7 (27.06.2025) ・ Die Defragmentierung wird nun mit der Prozess Priorität: "Normal" ausgeführt.
 v. 1.6 (01.02.2025) ・ Das Feature: "Recall" wird Deaktiviert, Weitere NVIDIA Caches hinzugefügt.
 v. 1.5 (04.12.2024) ・ Die ausgeblendeten Ordner: "Config.Msi" & "Recovery" in C: werden entfernt.
