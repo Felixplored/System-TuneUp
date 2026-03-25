@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.1
+title System TuneUp by Felixplored v. 1.2
 echo on
 rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -12,14 +12,26 @@ rem Bereinigung fortsetzen?
 pause
 dism /Online /Cleanup-Image /StartComponentCleanup
 dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
-dism /Online /Cleanup-Image /spsuperseded
+dism /Online /Cleanup-Image /SPSuperseded
 ipconfig /flushdns
-defrag C: /u
 chkdsk
+defrag C: /u
 wsreset
 taskkill /IM WinStore.App.exe /f /t
 vssadmin delete shadows /all /quiet
 wmic /namespace:\\root\default path SystemRestore call Disable C:\
+del %localappdata%\AMD\DX9Cache /f /q /s
+for /d %%a in ("%localappdata%\AMD\DX9Cache\*.*") do rd /q /s "%%a"
+del %localappdata%\AMD\DxCache /f /q /s
+for /d %%a in ("%localappdata%\AMD\DxCache\*.*") do rd /q /s "%%a"
+del %localappdata%\AMD\DxcCache /f /q /s
+for /d %%a in ("%localappdata%\AMD\DxcCache\*.*") do rd /q /s "%%a"
+del %localappdata%\AMD\OglCache /f /q /s
+for /d %%a in ("%localappdata%\AMD\OglCache\*.*") do rd /q /s "%%a"
+del %localappdata%\AMD\VkCache /f /q /s
+for /d %%a in ("%localappdata%\AMD\VkCache\*.*") do rd /q /s "%%a"
+del %localappdata%low\AMD\DxCache /f /q /s
+for /d %%a in ("%localappdata%low\AMD\DxCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\GLCache /f /q /s
 for /d %%a in ("%localappdata%\NVIDIA\GLCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\OptixCache /f /q /s
@@ -49,5 +61,4 @@ if "%auswahl%" == "n" goto nein
 shutdown /r
 :nein
 exit
-
 

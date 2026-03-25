@@ -1,6 +1,8 @@
-System TuneUp by Felixplored v. 1.1
+System TuneUp by Felixplored v. 1.2
 
 Versionshistorie:
+・ Der Befehl: "chkdsk" wird nun vor dem Befehl: "defrag C: /u" ausgeführt,
+  Die AMD Caches werden Bereinigt. (v. 1.2 25.11.2024)
 ・ Fortschritt für die Defragmentierung wird jetzt angezeigt,
   Die Systemwiederherstellung wird Bereinigt und Deaktiviert, 
   Die NVIDIA Caches werden Bereinigt,
