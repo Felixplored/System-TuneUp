@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.5
+title System TuneUp by Felixplored v. 1.6
 echo on
 rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -13,6 +13,7 @@ pause
 dism /Online /Cleanup-Image /StartComponentCleanup
 dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
 dism /Online /Cleanup-Image /SPSuperseded
+dism /Online /Disable-Feature /Featurename:Recall
 ipconfig /flushdns
 chkdsk
 defrag C: /u
@@ -42,10 +43,14 @@ del %localappdata%\AMD\VkCache /f /q /s
 for /d %%a in ("%localappdata%\AMD\VkCache\*.*") do rd /q /s "%%a"
 del %localappdata%low\AMD\DxCache /f /q /s
 for /d %%a in ("%localappdata%low\AMD\DxCache\*.*") do rd /q /s "%%a"
+del %localappdata%\NVIDIA\DXCache /f /q /s
+for /d %%a in ("%localappdata%\NVIDIA\DXCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\GLCache /f /q /s
 for /d %%a in ("%localappdata%\NVIDIA\GLCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\OptixCache /f /q /s
 for /d %%a in ("%localappdata%\NVIDIA\OptixCache\*.*") do rd /q /s "%%a"
+del %localappdata%low\NVIDIA\DXCache /f /q /s
+for /d %%a in ("%localappdata%low\NVIDIA\DXCache\*.*") do rd /q /s "%%a"
 del %localappdata%low\NVIDIA\PerDriverVersion\DXCache /f /q /s
 for /d %%a in ("%localappdata%low\NVIDIA\PerDriverVersion\DXCache\*.*") do rd /q /s "%%a"
 del %appdata%\NVIDIA\ComputeCache /f /q /s
@@ -71,4 +76,3 @@ if "%auswahl%" == "n" goto nein
 shutdown /r
 :nein
 exit
-
