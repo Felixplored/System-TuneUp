@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.3
+title System TuneUp by Felixplored v. 1.4
 echo on
 rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -20,8 +20,12 @@ wsreset
 taskkill /IM WinStore.App.exe /f /t
 vssadmin delete shadows /all /quiet
 wmic /namespace:\\root\default path SystemRestore call Disable C:\
+rd C:\$GetCurrent /q /s
 rd C:\$SysReset /q /s
+rd C:\$Windows.~BT /q /s
+rd C:\$Windows.~WS /q /s
 rd C:\$WinREAgent /q /s
+rd C:\Windows.old /q /s
 del C:\PerfLogs /f /q /s
 for /d %%a in ("C:\PerfLogs\*.*") do rd /q /s "%%a"
 del %localappdata%\AMD\DX9Cache /f /q /s

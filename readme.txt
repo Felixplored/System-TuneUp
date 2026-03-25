@@ -1,6 +1,8 @@
-System TuneUp by Felixplored v. 1.3
+System TuneUp by Felixplored v. 1.4
 
 Versionshistorie:
+・ Die ausgeblendeten Ordner: "$GetCurrent" & "$Windows.~BT" & "$Windows.~WS" in C: werden entfernt,
+  Der Ordner: "Windows.old" in C: wird entfernt. (v. 1.4 / 27.11.2024)
 ・ Die ausgeblendeten Ordner: "$SysReset" & "$WinREAgent" in C: werden entfernt,
   Der Ordner: "PerfLogs" in C: wird Bereinigt. (v. 1.3 / 26.11.2024)
 ・ Der Befehl: "chkdsk" wird nun vor dem Befehl: "defrag C: /u" ausgeführt,
