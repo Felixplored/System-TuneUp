@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.6
+title System TuneUp by Felixplored v. 1.7
 echo on
 rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -16,7 +16,7 @@ dism /Online /Cleanup-Image /SPSuperseded
 dism /Online /Disable-Feature /Featurename:Recall
 ipconfig /flushdns
 chkdsk
-defrag C: /u
+defrag C: /h /u
 wsreset
 taskkill /IM WinStore.App.exe /f /t
 vssadmin delete shadows /all /quiet

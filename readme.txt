@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v. 1.6
+System TuneUp by Felixplored v. 1.7
 
 Versionshistorie:
+v. 1.7 (27.06.2025) ・ Die Defragmentierung wird nun mit der Prozess Priorität: "Normal" ausgeführt.
 v. 1.6 (01.02.2025) ・ Das Feature: "Recall" wird Deaktiviert, Weitere NVIDIA Caches hinzugefügt.
 v. 1.5 (04.12.2024) ・ Die ausgeblendeten Ordner: "Config.Msi" & "Recovery" in C: werden entfernt.
 v. 1.4 (27.11.2024) ・ Die ausgeblendeten Ordner: "$GetCurrent" & "$Windows.~BT" & "$Windows.~WS" in C: werden entfernt,
