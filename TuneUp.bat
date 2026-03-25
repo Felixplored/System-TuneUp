@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.8
+title System TuneUp by Felixplored v. 1.9
 echo on
 rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -31,6 +31,8 @@ rd C:\Recovery /q /s
 rd C:\Windows.old /q /s
 del C:\PerfLogs /f /q /s
 for /d %%a in ("C:\PerfLogs\*.*") do rd /q /s "%%a"
+del C:\.cache\AMD\DX9Cache /f /q /s
+for /d %%a in ("C:\.cache\AMD\DX9Cache\*.*") do rd /q /s "%%a"
 del %localappdata%\AMD\DX9Cache /f /q /s
 for /d %%a in ("%localappdata%\AMD\DX9Cache\*.*") do rd /q /s "%%a"
 del %localappdata%\AMD\DxCache /f /q /s
@@ -43,6 +45,8 @@ del %localappdata%\AMD\VkCache /f /q /s
 for /d %%a in ("%localappdata%\AMD\VkCache\*.*") do rd /q /s "%%a"
 del %localappdata%low\AMD\DxCache /f /q /s
 for /d %%a in ("%localappdata%low\AMD\DxCache\*.*") do rd /q /s "%%a"
+del %localappdata%low\AMD\DxcCache /f /q /s
+for /d %%a in ("%localappdata%low\AMD\DxcCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\DXCache /f /q /s
 for /d %%a in ("%localappdata%\NVIDIA\DXCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\GLCache /f /q /s
