@@ -1,8 +1,10 @@
-System TuneUp by Felixplored v. 1.2
+System TuneUp by Felixplored v. 1.3
 
 Versionshistorie:
+・ Die ausgeblendeten Ordner: "$SysReset" & "$WinREAgent" in C: werden entfernt,
+  Der Ordner: "PerfLogs" in C: wird Bereinigt. (v. 1.3 / 26.11.2024)
 ・ Der Befehl: "chkdsk" wird nun vor dem Befehl: "defrag C: /u" ausgeführt,
-  Die AMD Caches werden Bereinigt. (v. 1.2 25.11.2024)
+  Die AMD Caches werden Bereinigt. (v. 1.2 / 25.11.2024)
 ・ Fortschritt für die Defragmentierung wird jetzt angezeigt,
   Die Systemwiederherstellung wird Bereinigt und Deaktiviert, 
   Die NVIDIA Caches werden Bereinigt,
@@ -19,7 +21,7 @@ Vorsicht:
 Durch Drücken einer beliebigen Taste wird das Programm weiter ausgeführt.
 Abbrechen erfolgt, wenn das Fenster geschlossen wird.
 Die Bereinigung kann je nach Computer länger andauern. 
-Die Bereinigung ist Abgeschlossen, wenn in der Kommandozeile: "Bereinigung beendet! Ein Neustart wird zwingend Empfohlen." steht.
+Die Bereinigung ist Abgeschlossen, wenn in der Kommandozeile: "Bereinigung beendet! Ein Neustart wird zwingend empfohlen." steht.
 Es muss am Ende eine Wahl zwecks Neustart getroffen werden. (y/n) - ENTER führt ebenfalls einen Neustart durch.
 
 Bekannte Fehler:
