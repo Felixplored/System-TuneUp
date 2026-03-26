@@ -1,10 +1,16 @@
 @echo off
-title System TuneUp by Felixplored v. 1.9
+title System TuneUp by Felixplored v. 1.10
 echo on
-rem Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
+rem Ersteinrichtung: Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
-cleanmgr /sageset
-cleanmgr /sagerun
+set auswahl=
+set /p auswahl="Moechten Sie die Ersteinrichtung ausfuehren? (y/n)"
+if "%auswahl%" == "y" goto ja
+if "%auswahl%" == "n" goto nein
+:ja
+cleanmgr /sageset:1
+:nein
+cleanmgr /sagerun:1
 dism /Online /Cleanup-Image /AnalyzeComponentStore
 echo on
 rem Bereinigung fortsetzen?
