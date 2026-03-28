@@ -1,6 +1,8 @@
-System TuneUp by Felixplored v. 1.10
+System TuneUp by Felixplored v. 1.11
 
 Versionshistorie:
+v. 1.11 (28.03.2026) ・ Die Ordner: "SquirrelTemp" in Local AppData & "Temp" in LocalLow AppData werden nun Bereinigt,
+                       Der Thumbnail Cache: "Microsoft\Windows\Explorer" in Local AppData wird nun Bereinigt.
 v. 1.10 (26.03.2026) ・ Ersteinrichtung hinzugefügt um ein aufhängen des Befehls-Skript zu mindern.
 v. 1.9  (28.11.2025) ・ Weitere AMD Caches hinzugefügt.
 v. 1.8  (17.07.2025) ・ Der Timer für den Neustart wurde auf 1 Minute gesetzt.

@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 1.10
+title System TuneUp by Felixplored v. 1.11
 echo on
 rem Ersteinrichtung: Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 @echo off
@@ -65,8 +65,14 @@ del %localappdata%low\NVIDIA\PerDriverVersion\DXCache /f /q /s
 for /d %%a in ("%localappdata%low\NVIDIA\PerDriverVersion\DXCache\*.*") do rd /q /s "%%a"
 del %appdata%\NVIDIA\ComputeCache /f /q /s
 for /d %%a in ("%appdata%\NVIDIA\ComputeCache\*.*") do rd /q /s "%%a"
+del %localappdata%\Microsoft\Windows\Explorer /f /q /s
+for /d %%a in ("%localappdata%\Microsoft\Windows\Explorer\*.*") do rd /q /s "%%a"
 del %temp% /f /q /s
 for /d %%a in ("%temp%\*.*") do rd /q /s "%%a"
+del %localappdata%\SquirrelTemp /f /q /s
+for /d %%a in ("%localappdata%\SquirrelTemp\*.*") do rd /q /s "%%a"
+del %localappdata%low\Temp /f /q /s
+for /d %%a in ("%localappdata%low\Temp\*.*") do rd /q /s "%%a"
 del C:\Windows\Temp /f /q /s
 for /d %%a in ("C:\Windows\Temp\*.*") do rd /q /s "%%a"
 del C:\Windows\SystemTemp /f /q /s
