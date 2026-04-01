@@ -1,8 +1,6 @@
 @echo off
-title System TuneUp by Felixplored v. 1.12
-echo on
-rem Ersteinrichtung: Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
-@echo off
+title System TuneUp by Felixplored v. 1.13
+echo Ersteinrichtung: Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 set auswahl=
 set /p auswahl="Moechten Sie die Ersteinrichtung ausfuehren? (y/n)"
 if "%auswahl%" == "y" goto ja
@@ -11,10 +9,12 @@ if "%auswahl%" == "n" goto nein
 cleanmgr /sageset:1
 :nein
 cleanmgr /sagerun:1
+cls
+echo Bestaetige mit: "Ja", Klicke auf: Temporaere Dateien -^> ALLE Haken setzen -^> Dateien entfernen -^> Weiter
+pause
+start ms-settings:storagesense
 dism /Online /Cleanup-Image /AnalyzeComponentStore
-echo on
-rem Bereinigung fortsetzen?
-@echo off
+echo Bereinigung fortsetzen^?
 pause
 dism /Online /Cleanup-Image /StartComponentCleanup
 dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
@@ -87,9 +87,8 @@ del C:\Windows\Prefetch /f /q /s
 for /d %%a in ("C:\Windows\Prefetch\*.*") do rd /q /s "%%a"
 del C:\Windows\SoftwareDistribution\Download /f /q /s
 for /d %%a in ("C:\Windows\SoftwareDistribution\Download\*.*") do rd /q /s "%%a"
-echo on
-rem Bereinigung beendet! Ein Neustart wird zwingend empfohlen.
-@echo off
+cls
+echo Bereinigung beendet! Ein Neustart wird zwingend empfohlen.
 set auswahl=
 set /p auswahl="Moechten Sie das System Neustarten? (y/n)"
 if "%auswahl%" == "y" goto ja

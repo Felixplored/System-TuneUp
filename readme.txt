@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v. 1.12
+System TuneUp by Felixplored v. 1.13
 
 Versionshistorie:
+v. 1.13 (01.04.2026) ・ Speicheroptimierung (Storage Sense) wird nun abgefragt.
 v. 1.12 (30.03.2026) ・ Der D3DS Cache in Local AppData wird nun Bereinigt, Der Logs Ordner: "C:\Windows\Logs" wird nun Bereinigt,
                        Der Caches Ordner: "Microsoft\Windows\Caches" in Local AppData wird nun Bereinigt.
 v. 1.11 (28.03.2026) ・ Die Ordner: "SquirrelTemp" in Local AppData & "Temp" in LocalLow AppData werden nun Bereinigt,
