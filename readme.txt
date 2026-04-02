@@ -1,6 +1,8 @@
-System TuneUp by Felixplored v. 1.13
+System TuneUp by Felixplored v. 1.14
 
 Versionshistorie:
+v. 1.14 (03.04.2026) ・ Admin-Check Funktion hinzugefügt damit das Batch immer als Administrator ausgeführt wird,
+                       Der Befehl: "chkdsk" wird nun mit dem Parameter C: /f ausgeführt.
 v. 1.13 (01.04.2026) ・ Speicheroptimierung (Storage Sense) wird nun abgefragt.
 v. 1.12 (30.03.2026) ・ Der D3DS Cache in Local AppData wird nun Bereinigt, Der Logs Ordner: "C:\Windows\Logs" wird nun Bereinigt,
                        Der Caches Ordner: "Microsoft\Windows\Caches" in Local AppData wird nun Bereinigt.
