@@ -1,9 +1,10 @@
-System TuneUp by Felixplored v. 1.15
+System TuneUp by Felixplored v. 1.16
 
 Versionshistorie:
+v. 1.16 (05.04.2026) ・ Fortschrittsanzeige hinzugefügt.
 v. 1.15 (04.04.2026) ・ Der Ruhezustand wird nun deaktiviert, Der Explorer wird nun vor dem leeren der Windows Caches beendet und erneut ausgeführt,
                        Der Icon Cache in Local AppData wird nun Bereinigt, Der Ordner: "Microsoft\Windows\Caches" in ProgrammData wird nun Bereinigt,
-					   Der Qt Shader Cache wird nun Bereinigt, Windows CrashDumps werden nun Bereinigt, Weitere Logs, Caches & Temps werden nun Bereinigt.			   
+		               Der Qt Shader Cache wird nun Bereinigt, Windows CrashDumps werden nun Bereinigt, Weitere Logs, Caches & Temps werden nun Bereinigt.			   
 v. 1.14 (03.04.2026) ・ Admin-Check Funktion hinzugefügt damit das Batch immer als Administrator ausgeführt wird,
                        Der Befehl: "chkdsk" wird nun mit dem Parameter C: /f ausgeführt.
 v. 1.13 (01.04.2026) ・ Speicheroptimierung (Storage Sense) wird nun abgefragt.
