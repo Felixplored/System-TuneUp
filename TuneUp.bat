@@ -7,7 +7,7 @@ if %errorlevel% neq 0 (
    exit
 )
 
-title System TuneUp by Felixplored v. 1.14
+title System TuneUp by Felixplored v. 1.15
 
 REM Windows Datenträgerbereinigung
 echo Ersteinrichtung: Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
@@ -37,20 +37,27 @@ dism /Online /Cleanup-Image /SPSuperseded
 REM Deaktivierung des Features: "Recall"
 dism /Online /Disable-Feature /Featurename:Recall
 
-REM DNS Cache leeren
-ipconfig /flushdns
+REM Systemwiederherstellungspunkte Löschen & Systemwiederherstellung Deaktivieren für Laufwerk C:
+vssadmin delete shadows /all /quiet
+wmic /namespace:\\root\default path SystemRestore call Disable C:\
+
+REM Ruhezustand deaktivieren
+powercfg -h off
 
 REM Dateisystemfehler prüfen & Defragmentierung von Laufwerk C: durchführen
 chkdsk C: /f
 defrag C: /h /u
 
+REM DNS Cache leeren
+ipconfig /flushdns
+
 REM Microsoft Store Cache leeren & Programm schließen
 wsreset
 taskkill /IM WinStore.App.exe /f /t
 
-REM Systemwiederherstellungspunkte Löschen & Systemwiederherstellung Deaktivieren für Laufwerk C:
-vssadmin delete shadows /all /quiet
-wmic /namespace:\\root\default path SystemRestore call Disable C:\
+REM Windows Event Logs leeren
+timeout /t 5 /nobreak >nul
+for /F "tokens=*" %%1 in ('wevtutil.exe el') DO wevtutil.exe cl "%%1"
 
 REM Versteckte Windows Ordner Löschen
 rd C:\$GetCurrent /q /s
@@ -102,6 +109,64 @@ REM D3DS Cache leeren
 del %localappdata%\D3DSCache /f /q /s
 for /d %%a in ("%localappdata%\D3DSCache\*.*") do rd /q /s "%%a"
 
+REM Qt Shader Cache leeren
+del %localappdata%\cache /f /q /s
+for /d %%a in ("%localappdata%\cache\*.*") do rd /q /s "%%a"
+del %localappdata%\fontconfig /f /q /s
+for /d %%a in ("%localappdata%\fontconfig\*.*") do rd /q /s "%%a"
+
+REM Task Scheduler Cache leeren
+del C:\Windows\SchCache /f /q /s
+for /d %%a in ("C:\Windows\SchCache\*.*") do rd /q /s "%%a"
+
+REM Windows Temps leeren
+del %temp% /f /q /s
+for /d %%a in ("%temp%\*.*") do rd /q /s "%%a"
+del %localappdata%\SquirrelTemp /f /q /s
+for /d %%a in ("%localappdata%\SquirrelTemp\*.*") do rd /q /s "%%a"
+del %localappdata%low\Temp /f /q /s
+for /d %%a in ("%localappdata%low\Temp\*.*") do rd /q /s "%%a"
+del C:\Windows\Temp /f /q /s
+for /d %%a in ("C:\Windows\Temp\*.*") do rd /q /s "%%a"
+del C:\Windows\SystemTemp /f /q /s
+for /d %%a in ("C:\Windows\SystemTemp\*.*") do rd /q /s "%%a"
+del C:\Windows\CbsTemp /f /q /s
+for /d %%a in ("C:\Windows\CbsTemp\*.*") do rd /q /s "%%a"
+del C:\Windows\SoftwareDistribution\Download /f /q /s
+for /d %%a in ("C:\Windows\SoftwareDistribution\Download\*.*") do rd /q /s "%%a"
+
+REM Windows CrashDumps leeren
+del %localappdata%\CrashDumps /f /q /s
+for /d %%a in ("%localappdata%\CrashDumps\*.*") do rd /q /s "%%a"
+del C:\ProgramData\Microsoft\Windows\WER /f /q /s
+for /d %%a in ("C:\ProgramData\Microsoft\Windows\WER\*.*") do rd /q /s "%%a"
+del C:\Windows\LiveKernelReports /f /q /s
+for /d %%a in ("C:\Windows\LiveKernelReports\*.*") do rd /q /s "%%a"
+del C:\Windows\Minidump /f /q /s
+for /d %%a in ("C:\Windows\Minidump\*.*") do rd /q /s "%%a"
+
+REM Windows Logs leeren
+del C:\Windows\Logs /f /q /s
+for /d %%a in ("C:\Windows\Logs\*.*") do rd /q /s "%%a"
+del C:\Windows\debug /f /q /s
+for /d %%a in ("C:\Windows\debug\*.*") do rd /q /s "%%a"
+
+REM Windows Prefetch leeren
+del C:\Windows\Prefetch /f /q /s
+for /d %%a in ("C:\Windows\Prefetch\*.*") do rd /q /s "%%a"
+
+REM Explorer beenden & prüfen ob beendet
+taskkill /f /im explorer.exe >nul 2>&1
+:check
+tasklist | find /i "explorer.exe" >nul
+if not errorlevel 1 (
+   timeout /t 1 >nul
+   goto check
+)
+
+REM Icon Cache leeren
+del %localappdata%\IconCache.db /a /f /q
+
 REM Thumbnail Cache leeren
 del %localappdata%\Microsoft\Windows\Explorer /f /q /s
 for /d %%a in ("%localappdata%\Microsoft\Windows\Explorer\*.*") do rd /q /s "%%a"
@@ -109,24 +174,11 @@ for /d %%a in ("%localappdata%\Microsoft\Windows\Explorer\*.*") do rd /q /s "%%a
 REM Weitere Windows Caches leeren
 del %localappdata%\Microsoft\Windows\Caches /f /q /s
 for /d %%a in ("%localappdata%\Microsoft\Windows\Caches\*.*") do rd /q /s "%%a"
+del C:\ProgramData\Microsoft\Windows\Caches /f /q /s
+for /d %%a in ("C:\ProgramData\Microsoft\Windows\Caches\*.*") do rd /q /s "%%a"
 
-REM Windows Temp, Logs & Prefetch leeren
-del %temp% /f /q /s
-for /d %%a in ("%temp%\*.*") do rd /q /s "%%a"
-del %localappdata%\SquirrelTemp /f /q /s
-for /d %%a in ("%localappdata%\SquirrelTemp\*.*") do rd /q /s "%%a"
-del %localappdata%low\Temp /f /q /s
-for /d %%a in ("%localappdata%low\Temp\*.*") do rd /q /s "%%a"
-del C:\Windows\Logs /f /q /s
-for /d %%a in ("C:\Windows\Logs\*.*") do rd /q /s "%%a"
-del C:\Windows\Temp /f /q /s
-for /d %%a in ("C:\Windows\Temp\*.*") do rd /q /s "%%a"
-del C:\Windows\SystemTemp /f /q /s
-for /d %%a in ("C:\Windows\SystemTemp\*.*") do rd /q /s "%%a"
-del C:\Windows\Prefetch /f /q /s
-for /d %%a in ("C:\Windows\Prefetch\*.*") do rd /q /s "%%a"
-del C:\Windows\SoftwareDistribution\Download /f /q /s
-for /d %%a in ("C:\Windows\SoftwareDistribution\Download\*.*") do rd /q /s "%%a"
+REM Explorer starten
+start explorer.exe
 
 REM Neustart Abfrage
 cls
