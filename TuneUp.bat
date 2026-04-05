@@ -7,38 +7,52 @@ if %errorlevel% neq 0 (
    exit
 )
 
-title System TuneUp by Felixplored v. 1.16
+title System TuneUp by Felixplored v. 1.17
+
+REM Reparatur Abfrage
+set auswahl=
+set /p auswahl="Moechten Sie eine Reparatur des Computers durchfuehren? (y/n)"
+if "%auswahl%" == "y" goto ja
+if "%auswahl%" == "n" goto nein
+:ja
+:: Reparatur des Component Store
+dism /Online /Cleanup-Image /RestoreHealth
+:: System File Checker ausführen
+sfc /scannow
+:: Dateisystemfehler überprüfen
+chkdsk C: /f
+:nein
 
 REM Windows Datenträgerbereinigung
+cls
 echo Ersteinrichtung: Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
 set auswahl=
 set /p auswahl="Moechten Sie die Ersteinrichtung ausfuehren? (y/n)"
 if "%auswahl%" == "y" goto ja
 if "%auswahl%" == "n" goto nein
 :ja
+:: Setzen der Bereinigungspunkte
 cleanmgr /sageset:1
 :nein
+:: Start der Bereinigunspunkte
 cleanmgr /sagerun:1
 
-REM Speicheroptimierung (Storage Sense) & Analyse des Component Store
+REM Speicheroptimierung (Storage Sense)
 cls
 echo Bestaetige mit: "Ja", Klicke auf: Temporaere Dateien -^> ALLE Haken setzen -^> Dateien entfernen -^> Weiter
 pause
 start ms-settings:storagesense
-dism /Online /Cleanup-Image /AnalyzeComponentStore
 echo Bereinigung fortsetzen^?
 pause
+cls
 
 REM Bereinigung des Component Store
-dism /Online /Cleanup-Image /StartComponentCleanup
 dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
-dism /Online /Cleanup-Image /SPSuperseded
 
 REM Deaktivierung des Features: "Recall"
 dism /Online /Disable-Feature /Featurename:Recall
 
-REM Dateisystemfehler prüfen & Defragmentierung durchführen für Laufwerk C:
-chkdsk C: /f
+REM Defragmentierung durchführen für Laufwerk C:
 defrag C: /h /u
 
 REM Systemwiederherstellungspunkte löschen & Systemwiederherstellung deaktivieren für Laufwerk C:
@@ -218,9 +232,10 @@ del C:\Windows\Prefetch /f /q /s
 for /d %%a in ("C:\Windows\Prefetch\*.*") do rd /q /s "%%a"
 ) >nul 2>&1
 
-REM Explorer beenden & prüfen ob beendet
+REM Explorer beenden
 taskkill /f /im explorer.exe >nul 2>&1
 :check
+:: Prüfen ob beendet
 tasklist | find /i "explorer.exe" >nul
 if not errorlevel 1 (
    timeout /t 1 >nul
@@ -264,6 +279,8 @@ set /p auswahl="Moechten Sie das System Neustarten? (y/n)"
 if "%auswahl%" == "y" goto ja
 if "%auswahl%" == "n" goto nein
 :ja
+:: Der Computer wird in einer Minute neugestartet
 shutdown /r /t 60
 :nein
+:: Programm verlassen
 exit

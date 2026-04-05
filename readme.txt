@@ -1,6 +1,8 @@
-System TuneUp by Felixplored v. 1.16
+System TuneUp by Felixplored v. 1.17
 
 Versionshistorie:
+v. 1.17 (06.04.2026) ・ Nutzlose DISM Befehle aussortiert & neuen DISM Befehl zum Reparieren des Component Store hinzugefügt,
+                       System File Checker hinzugefügt, Reparatur Abfrage am Anfang des Befehls-Skript eingefügt.
 v. 1.16 (05.04.2026) ・ Fortschrittsanzeige hinzugefügt.
 v. 1.15 (04.04.2026) ・ Der Ruhezustand wird nun deaktiviert, Der Explorer wird nun vor dem leeren der Windows Caches beendet und erneut ausgeführt,
                        Der Icon Cache in Local AppData wird nun Bereinigt, Der Ordner: "Microsoft\Windows\Caches" in ProgrammData wird nun Bereinigt,
@@ -46,4 +48,5 @@ Vorsicht:
 
 Bekannte Fehler:
 ・ Sollte das Befehls-Skript beim ersten Schritt hängen bleiben starte die: "TuneUp.bat" neu.
+・ Bei Ausführung der Defragmentierung wird sporadisch der Fortschritt nicht korrekt dargestellt.
 ・ Am Ende des Befehls-Skript kann es vereinzelt vorkommen, dass die Taskleiste erst später erscheint.
