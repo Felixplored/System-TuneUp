@@ -7,33 +7,57 @@ if %errorlevel% neq 0 (
    exit
 )
 
-title System TuneUp by Felixplored v. 1.17
+title System TuneUp by Felixplored v. 1.18
 
-REM Reparatur Abfrage
+REM Auswahl-Menü
+:menu
+cls
+echo ======================================
+echo ^|    System TuneUp by Felixplored    ^|          
+echo ======================================
+echo  1 - Ersteinrichtung                 =
+echo  2 - PC Reparieren                   =
+echo  3 - PC Bereinigen                   =
+echo  0 - Restart / Exit                  =
+echo ======================================
 set auswahl=
-set /p auswahl="Moechten Sie eine Reparatur des Computers durchfuehren? (y/n)"
+set /p auswahl="Auswahl:"
+if "%auswahl%" == "1" goto config
+if "%auswahl%" == "2" goto repair
+if "%auswahl%" == "3" goto clean
+if "%auswahl%" == "0" goto exit
+goto menu
+
+REM Neustart Abfrage
+:exit
+echo Empfohlen: Moechten Sie das System neu starten^? (y/n)
+set auswahl=
+set /p auswahl="Auswahl:"
 if "%auswahl%" == "y" goto ja
 if "%auswahl%" == "n" goto nein
 :ja
+:: Der Computer wird in einer Minute neugestartet
+shutdown /r /t 60
+:nein
+:: Programm verlassen
+exit
+
+REM Reparatur durchführen
+:repair
 :: Reparatur des Component Store
 dism /Online /Cleanup-Image /RestoreHealth
 :: System File Checker ausführen
 sfc /scannow
 :: Dateisystemfehler überprüfen
 chkdsk C: /f
-:nein
+goto menu
 
 REM Windows Datenträgerbereinigung
-cls
-echo Ersteinrichtung: Bitte ALLE Haken setzen und mit: "OK" bestaetigen.
-set auswahl=
-set /p auswahl="Moechten Sie die Ersteinrichtung ausfuehren? (y/n)"
-if "%auswahl%" == "y" goto ja
-if "%auswahl%" == "n" goto nein
-:ja
+:config
 :: Setzen der Bereinigungspunkte
 cleanmgr /sageset:1
-:nein
+goto menu
+:clean
 :: Start der Bereinigunspunkte
 cleanmgr /sagerun:1
 
@@ -271,16 +295,4 @@ REM Explorer starten
 cls
 echo [==========================100.0%%==========================]
 start explorer.exe
-
-REM Neustart Abfrage
-echo Bereinigung beendet! Ein Neustart wird zwingend empfohlen.
-set auswahl=
-set /p auswahl="Moechten Sie das System Neustarten? (y/n)"
-if "%auswahl%" == "y" goto ja
-if "%auswahl%" == "n" goto nein
-:ja
-:: Der Computer wird in einer Minute neugestartet
-shutdown /r /t 60
-:nein
-:: Programm verlassen
-exit
+goto menu

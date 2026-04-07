@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v. 1.17
+System TuneUp by Felixplored v. 1.18
 
 Versionshistorie:
+v. 1.18 (07.04.2026) ・ Auswahl-Menü hinzugefügt.
 v. 1.17 (06.04.2026) ・ Nutzlose DISM Befehle aussortiert & neuen DISM Befehl zum Reparieren des Component Store hinzugefügt,
                        System File Checker hinzugefügt, Reparatur Abfrage am Anfang des Befehls-Skript eingefügt.
 v. 1.16 (05.04.2026) ・ Fortschrittsanzeige hinzugefügt.
@@ -42,11 +43,11 @@ Diese Batch Datei führt eine Bereinigung des Computers durch mit Hauseigenen Wi
 Vorsicht: 
 ・ Durch Drücken einer beliebigen Taste wird das Programm weiter ausgeführt.
 ・ Abbrechen erfolgt, wenn das Fenster geschlossen wird.
-・ Die Bereinigung kann je nach Computer länger andauern. 
-・ Die Bereinigung ist Abgeschlossen, wenn in der Kommandozeile: "Bereinigung beendet! Ein Neustart wird zwingend empfohlen." steht.
-・ Es muss am Ende eine Wahl zwecks Neustart getroffen werden. (y/n) - ENTER führt ebenfalls einen Neustart durch.
+・ Die Bereinigung kann je nach Computer länger andauern.
+・ Beende das Programm immer über das Auswahl-Menü: "0" (Bitte einen Neustart durchführen, wenn das System Bereinigt wurde.)
+・ Es muss am Ende eine Wahl zwecks Neustart getroffen werden. (y/n) - ENTER führt ebenfalls einen Neustart durch. 
 
 Bekannte Fehler:
-・ Sollte das Befehls-Skript beim ersten Schritt hängen bleiben starte die: "TuneUp.bat" neu.
+・ Sollte das Befehls-Skript beim ersten Schritt hängen bleiben, starte die: "TuneUp.bat" neu.
 ・ Bei Ausführung der Defragmentierung wird sporadisch der Fortschritt nicht korrekt dargestellt.
 ・ Am Ende des Befehls-Skript kann es vereinzelt vorkommen, dass die Taskleiste erst später erscheint.
