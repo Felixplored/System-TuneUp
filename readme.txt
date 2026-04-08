@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v. 1.18
+System TuneUp by Felixplored v. 1.19
 
 Versionshistorie:
+v. 1.19 (08.04.2026) ・ Auswahl-Menü erweitert, Informations Dialog Fenster hinzugefügt. 
 v. 1.18 (07.04.2026) ・ Auswahl-Menü hinzugefügt.
 v. 1.17 (06.04.2026) ・ Nutzlose DISM Befehle aussortiert & neuen DISM Befehl zum Reparieren des Component Store hinzugefügt,
                        System File Checker hinzugefügt, Reparatur Abfrage am Anfang des Befehls-Skript eingefügt.
@@ -33,19 +34,17 @@ v. 1.1  (24.11.2024) ・ Fortschritt für die Defragmentierung wird jetzt angeze
                        Neustart Funktion hinzugefügt.
 v. 1.0  (22.11.2024) ・ Versionshistorie erstellt.
 
-Diese Batch Datei führt eine Bereinigung des Computers durch mit Hauseigenen Windows Tools per Befehls-Skript.
+Diese Batch Datei führt eine Reparatur oder Bereinigung des Computers durch mit hauseigenen Windows Tools per Befehls-Skript.
 
 1. Beende alle laufenden Programme vor dem Start.
 2. Entpacke die: "TuneUp.bat" aus dem WinRAR-Archiv.
 3. Führe die: "TuneUp.bat" als Administrator aus.
-4. Folge den Anweisungen in der Kommandozeile.
+4. Folge den Anweisungen in der Kommandozeile und den Dialog Fenstern.
  
 Vorsicht: 
-・ Durch Drücken einer beliebigen Taste wird das Programm weiter ausgeführt.
-・ Abbrechen erfolgt, wenn das Fenster geschlossen wird.
 ・ Die Bereinigung kann je nach Computer länger andauern.
-・ Beende das Programm immer über das Auswahl-Menü: "0" (Bitte einen Neustart durchführen, wenn das System Bereinigt wurde.)
-・ Es muss am Ende eine Wahl zwecks Neustart getroffen werden. (y/n) - ENTER führt ebenfalls einen Neustart durch. 
+・ Durch Drücken einer beliebigen Taste wird das Programm weiter ausgeführt.
+・ Abbrechen erfolgt, wenn das Fenster geschlossen wird oder durch Strg + C.
 
 Bekannte Fehler:
 ・ Sollte das Befehls-Skript beim ersten Schritt hängen bleiben, starte die: "TuneUp.bat" neu.

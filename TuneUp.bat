@@ -1,4 +1,7 @@
 @echo off
+title System TuneUp by Felixplored v. 1.19
+color 06
+
 REM Admin-Check
 net session >nul 2>&1
 if %errorlevel% neq 0 (
@@ -6,8 +9,6 @@ if %errorlevel% neq 0 (
    pause
    exit
 )
-
-title System TuneUp by Felixplored v. 1.18
 
 REM Auswahl-Menü
 :menu
@@ -18,43 +19,42 @@ echo ======================================
 echo  1 - Ersteinrichtung                 =
 echo  2 - PC Reparieren                   =
 echo  3 - PC Bereinigen                   =
-echo  0 - Restart / Exit                  =
+echo  4 - PC Neustarten (empfohlen)       =
+echo  0 - Programm verlassen              =
 echo ======================================
 set auswahl=
 set /p auswahl="Auswahl:"
 if "%auswahl%" == "1" goto config
 if "%auswahl%" == "2" goto repair
 if "%auswahl%" == "3" goto clean
+if "%auswahl%" == "4" goto restart
 if "%auswahl%" == "0" goto exit
 goto menu
 
-REM Neustart Abfrage
-:exit
-echo Empfohlen: Moechten Sie das System neu starten^? (y/n)
-set auswahl=
-set /p auswahl="Auswahl:"
-if "%auswahl%" == "y" goto ja
-if "%auswahl%" == "n" goto nein
-:ja
-:: Der Computer wird in einer Minute neugestartet
+REM Neustart durchfuehren
+:restart
+:: Der Computer wird in einer Minute neu gestartet
 shutdown /r /t 60
-:nein
-:: Programm verlassen
 exit
 
 REM Reparatur durchführen
 :repair
 :: Reparatur des Component Store
+cls
 dism /Online /Cleanup-Image /RestoreHealth
 :: System File Checker ausführen
+cls
 sfc /scannow
 :: Dateisystemfehler überprüfen
+cls
 chkdsk C: /f
+echo msgbox "Reparatur beendet! Ein Neustart wird empfohlen.",4160,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
 goto menu
 
 REM Windows Datenträgerbereinigung
 :config
 :: Setzen der Bereinigungspunkte
+echo msgbox "Bitte ALLE Haken setzen und mit OK bestaetigen.",4160,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
 cleanmgr /sageset:1
 goto menu
 :clean
@@ -62,22 +62,21 @@ goto menu
 cleanmgr /sagerun:1
 
 REM Speicheroptimierung (Storage Sense)
-cls
-echo Bestaetige mit: "Ja", Klicke auf: Temporaere Dateien -^> ALLE Haken setzen -^> Dateien entfernen -^> Weiter
-pause
+echo msgbox "Bestaetige im Anschluss mit Ja",4160,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
 start ms-settings:storagesense
-echo Bereinigung fortsetzen^?
-pause
+echo msgbox "Klicke auf Temporaere Dateien -> ALLE Haken setzen -> Dateien entfernen -> Weiter. Schliesse im Anschluss das Fenster.",4160,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
+
+REM Defragmentierung durchführen für Laufwerk C:
 cls
+defrag C: /h /u
 
 REM Bereinigung des Component Store
+cls
 dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
 
 REM Deaktivierung des Features: "Recall"
+cls
 dism /Online /Disable-Feature /Featurename:Recall
-
-REM Defragmentierung durchführen für Laufwerk C:
-defrag C: /h /u
 
 REM Systemwiederherstellungspunkte löschen & Systemwiederherstellung deaktivieren für Laufwerk C:
 cls
@@ -295,4 +294,5 @@ REM Explorer starten
 cls
 echo [==========================100.0%%==========================]
 start explorer.exe
+echo msgbox "Bereinigung beendet! Ein Neustart wird empfohlen.",4160,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
 goto menu
