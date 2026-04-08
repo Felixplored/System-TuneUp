@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v. 2.0
+title System TuneUp by Felixplored v. 2.1
 color 06
 chcp 1252 >nul
 
@@ -43,11 +43,11 @@ pause
 mode con: cols=120 lines=30
 goto menu
 
-REM Neustart durchführen
+REM Neustart Abfrage
 :restart
-:: Der Computer wird in einer Minute neu gestartet
-shutdown /r /t 60
-exit
+:: Ja ~ Der Computer wird in einer Minute neu gestartet | Nein ~ Zurück ins Auswahl-Menü
+echo wscript.quit msgbox("Möchten Sie das System neu starten?",4388,"System TuneUp by Felixplored")>%temp%\i.vbs & wscript %temp%\i.vbs & set res=%errorlevel% & del %temp%\i.vbs
+if %res% equ 6 (shutdown /r /t 60) else (goto menu)
 
 REM Reparatur durchführen
 :repair

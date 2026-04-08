@@ -1,8 +1,10 @@
-System TuneUp by Felixplored v. 2.0
+System TuneUp by Felixplored v. 2.1
 
 Versionshistorie:
+v. 2.1  (09.04.2026) · Neustart Abfrage Dialog Fenster hinzugefügt.
 v. 2.0  (08.04.2026) · Programm Codierung auf: "ANSI" & "Windows Command Script" umgestellt,
                        README Codierung auf: "ANSI" umgestellt, Auswahl-Menü erweitert.
+—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————					   
 v. 1.19 (08.04.2026) · Auswahl-Menü erweitert, Informations Dialog Fenster hinzugefügt. 
 v. 1.18 (07.04.2026) · Auswahl-Menü hinzugefügt.
 v. 1.17 (06.04.2026) · Nutzlose DISM Befehle aussortiert & neuen DISM Befehl zum Reparieren des Component Store hinzugefügt,
