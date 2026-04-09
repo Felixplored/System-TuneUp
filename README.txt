@@ -1,56 +1,58 @@
-System TuneUp by Felixplored v. 2.1
+System TuneUp by Felixplored v. 2.2
 
-Versionshistorie:
-v. 2.1  (09.04.2026) · Neustart Abfrage Dialog Fenster hinzugefügt.
-v. 2.0  (08.04.2026) · Programm Codierung auf: "ANSI" & "Windows Command Script" umgestellt,
-                       README Codierung auf: "ANSI" umgestellt, Auswahl-Menü erweitert.
-—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————					   
-v. 1.19 (08.04.2026) · Auswahl-Menü erweitert, Informations Dialog Fenster hinzugefügt. 
-v. 1.18 (07.04.2026) · Auswahl-Menü hinzugefügt.
-v. 1.17 (06.04.2026) · Nutzlose DISM Befehle aussortiert & neuen DISM Befehl zum Reparieren des Component Store hinzugefügt,
-                       System File Checker hinzugefügt, Reparatur Abfrage am Anfang des Befehls-Skript eingefügt.
-v. 1.16 (05.04.2026) · Fortschrittsanzeige hinzugefügt.
-v. 1.15 (04.04.2026) · Der Ruhezustand wird nun deaktiviert, Der Explorer wird nun vor dem leeren der Windows Caches beendet und erneut ausgeführt,
-                       Der Icon Cache in Local AppData wird nun Bereinigt, Der Ordner: "Microsoft\Windows\Caches" in ProgrammData wird nun Bereinigt,
-		       Der Qt Shader Cache wird nun Bereinigt, Windows CrashDumps werden nun Bereinigt, Weitere Logs, Caches & Temps werden nun Bereinigt.
-v. 1.14 (03.04.2026) · Admin-Check Funktion hinzugefügt damit das Batch immer als Administrator ausgeführt wird,
-                       Der Befehl: "chkdsk" wird nun mit dem Parameter C: /f ausgeführt.
-v. 1.13 (01.04.2026) · Speicheroptimierung (Storage Sense) wird nun abgefragt.
-v. 1.12 (30.03.2026) · Der D3DS Cache in Local AppData wird nun Bereinigt, Der Logs Ordner: "C:\Windows\Logs" wird nun Bereinigt,
-                       Der Caches Ordner: "Microsoft\Windows\Caches" in Local AppData wird nun Bereinigt.
-v. 1.11 (28.03.2026) · Die Ordner: "SquirrelTemp" in Local AppData & "Temp" in LocalLow AppData werden nun Bereinigt,
-                       Der Thumbnail Cache: "Microsoft\Windows\Explorer" in Local AppData wird nun Bereinigt.
-v. 1.10 (26.03.2026) · Ersteinrichtung hinzugefügt um ein aufhängen des Befehls-Skript zu mindern.
-v. 1.9  (28.11.2025) · Weitere AMD Caches hinzugefügt.
-v. 1.8  (17.07.2025) · Der Timer für den Neustart wurde auf 1 Minute gesetzt.
-v. 1.7  (27.06.2025) · Die Defragmentierung wird nun mit der Prozess Priorität: "Normal" ausgeführt.
-v. 1.6  (01.02.2025) · Das Feature: "Recall" wird Deaktiviert, Weitere NVIDIA Caches hinzugefügt.
-v. 1.5  (04.12.2024) · Die ausgeblendeten Ordner: "Config.Msi" & "Recovery" in C: werden entfernt.
-v. 1.4  (27.11.2024) · Die ausgeblendeten Ordner: "$GetCurrent" & "$Windows.~BT" & "$Windows.~WS" in C: werden entfernt,
-                       Der Ordner: "Windows.old" in C: wird entfernt.
-v. 1.3  (26.11.2024) · Die ausgeblendeten Ordner: "$SysReset" & "$WinREAgent" in C: werden entfernt,
-                       Der Ordner: "PerfLogs" in C: wird Bereinigt.
-v. 1.2  (25.11.2024) · Der Befehl: "chkdsk" wird nun vor dem Befehl: "defrag C: /u" ausgeführt,
-                       Die AMD Caches werden Bereinigt.
-v. 1.1  (24.11.2024) · Fortschritt für die Defragmentierung wird jetzt angezeigt,
-                       Die Systemwiederherstellung wird Bereinigt und Deaktiviert, 
-                       Die NVIDIA Caches werden Bereinigt,
-                       Neustart Funktion hinzugefügt.
-v. 1.0  (22.11.2024) · Versionshistorie erstellt.
+Version-History:
+v. 2.2  (2026-04-10) Â· Set the encoding for the program and README back to â€œUTF-8â€, switched the program and README to English,
+                       The drop-down menu is minimized.
+v. 2.1  (2026-04-09) Â· Added a â€œRestartâ€ dialog box.
+v. 2.0  (2026-04-08) Â· Program encoding changed to: â€œANSIâ€ & â€œWindows Command Scriptâ€,
+                       README: Encoding changed to â€œANSIâ€; drop-down menu expanded.
+=======================================================================================================================================================================================
+v. 1.19 (2026-04-08) Â· The selection menu has been expanded, and an information dialog box has been added.  
+v. 1.18 (2026-04-07) Â· Added to the drop-down menu.
+v. 1.17 (2026-04-06) Â· Removed unnecessary DISM commands & added a new DISM command to repair the Component Store,
+                       Added System File Checker; inserted a repair prompt at the beginning of the command script.
+v. 1.16 (2026-04-05) Â· Progress bar added.
+v. 1.15 (2026-04-04) Â· Quick Start & Hibernate will now be disabled. Explorer will now be closed and restarted before the Windows caches are cleared,
+                       The icon cache in Local AppData is now being cleaned up. The folder â€œMicrosoft\Windows\Cachesâ€ in ProgramData is now being cleaned up,
+                       The Qt Shader Cache is now being cleaned up, Windows crash dumps are now being cleaned up, and other logs, caches, and temporary files are now being cleaned up.
+v. 1.14 (2026-04-03) Â· Added an admin check feature so that the batch always runs as an administrator,
+                       The command â€œchkdskâ€ is now run with the parameter C: /f.
+v. 1.13 (2026-04-01) Â· Storage Sense is now being queried.
+v. 1.12 (2026-03-30) Â· The D3DS cache in Local AppData is now being cleaned up. The Logs folder: â€œC:\Windows\Logsâ€ is now being cleaned up,
+                       The â€œMicrosoft\Windows\Cachesâ€ folder in Local AppData is now being cleaned up.
+v. 1.11 (2026-03-28) Â· The â€œSquirrelTempâ€ folder in LocalAppData and the â€œTempâ€ folder in LocalLowAppData are now being cleaned up,
+                       The thumbnail cache: â€œMicrosoft\Windows\Explorerâ€ in Local AppData is now being cleared.
+v. 1.10 (2026-03-26) Â· Added initial setup to prevent the command script from hanging.
+v. 1.9  (2025-11-28) Â· Additional AMD caches have been added.
+v. 1.8  (2025-07-17) Â· The restart timer has been set to 1 minute.
+v. 1.7  (2025-06-27) Â· Defragmentation is now being performed with the process priority set to â€œNormalâ€.
+v. 1.6  (2025-02-01) Â· The â€œRecallâ€ feature is disabled; additional NVIDIA caches are added.
+v. 1.5  (2024-12-04) Â· The hidden folders â€œConfig.Msiâ€ and â€œRecoveryâ€ in C: will be deleted.
+v. 1.4  (2024-11-27) Â· The hidden folders â€œ$GetCurrentâ€, â€œ$Windows.~BTâ€, and â€œ$Windows.~WSâ€ in C: will be removed,
+                       The â€œWindows.oldâ€ folder in C: will be deleted.
+v. 1.3  (2024-11-26) Â· The hidden folders â€œ$SysResetâ€ and â€œ$WinREAgentâ€ in C: will be removed,
+                       The â€œPerfLogsâ€ folder in C: is being cleaned up.
+v. 1.2  (2024-11-25) Â· The â€œchkdskâ€ command is now executed before the â€œdefrag C: /uâ€ command,
+                       The AMD caches are being cleared.
+v. 1.1  (2024-11-24) Â· The defragmentation progress is now displayed,
+                       System Restore will be cleaned up and disabled,
+                       The NVIDIA caches are being cleared,
+                       Restart feature added.
+v. 1.0  (2024-11-22) Â· Version-History created.
 
-Diese CMD Datei führt eine Reparatur oder Bereinigung des Computers durch mit hauseigenen Windows Tools per Befehls-Skript.
+This CMD file performs a repair or cleanup of your computer using built-in Windows tools via a command-line script.
 
-1. Beende alle laufenden Programme vor dem Start.
-2. Entpacke die: "TuneUp.cmd" aus dem WinRAR-Archiv.
-3. Führe die: "TuneUp.cmd" als Administrator aus.
-4. Folge den Anweisungen in der Kommandozeile und den Dialog Fenstern.
+1. Close all running programs before starting.
+2. Extract the â€œTuneUp.cmdâ€ file from the WinRAR archive.
+3. Run â€œTuneUp.cmdâ€ as an administrator.
+4. Follow the instructions in the command line and the dialog windows.
  
-Vorsicht: 
-· Die Bereinigung kann je nach Computer länger andauern.
-· Durch Drücken einer beliebigen Taste wird das Programm weiter ausgeführt.
-· Abbrechen erfolgt, wenn das Fenster geschlossen wird oder durch Strg + C.
+Caution: 
+Â· The cleanup may take longer depending on your computer.
+Â· Pressing any key will continue the program.
+Â· To cancel, close the window or press Ctrl + C.
 
-Bekannte Fehler:
-· Sollte das Befehls-Skript beim ersten Schritt hängen bleiben, starte die: "TuneUp.cmd" neu.
-· Bei Ausführung der Defragmentierung wird sporadisch der Fortschritt nicht korrekt dargestellt.
-· Am Ende des Befehls-Skript kann es vereinzelt vorkommen, dass die Taskleiste erst später erscheint.
+Known issues:
+Â· If the command script gets stuck during the first step, restart â€œTuneUp.cmdâ€.
+Â· When running the defragmentation, the progress bar may occasionally not display correctly.
+Â· At the end of the command script, the taskbar may occasionally appear with a delay.
