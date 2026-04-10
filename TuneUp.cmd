@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 color 06
-title System TuneUp by Felixplored v. 2.2
+title System TuneUp by Felixplored v2.3.0
 
 REM Admin-Check
 net session >nul 2>&1
@@ -35,13 +35,16 @@ goto menu
 REM Exit
 :end
 :: Yes ~ PC restarts in one minute | No ~ Exit
-echo wscript.quit msgbox("Would you like to restart the system?",4388,"System TuneUp by Felixplored")>%temp%\i.vbs & wscript %temp%\i.vbs & set res=%errorlevel% & del %temp%\i.vbs
-if %res% equ 6 (shutdown /r /t 60) else (exit)
+echo wscript.quit msgbox("Would you like to restart the system?",4388,"System TuneUp by Felixplored") >%temp%\i.vbs
+start /wait wscript %temp%\i.vbs
+set res=%errorlevel%
+del %temp%\i.vbs
+if %res% equ 6 (shutdown /r /t 60 & exit) else (exit)
 
 REM Open README
 :readme
 cls
-mode con: cols=185 lines=60
+mode con: cols=185 lines=62
 more "%~dp0README.txt"
 pause
 mode con: cols=120 lines=30
@@ -110,7 +113,7 @@ echo [========                  15.0%%                           ]
 ipconfig /flushdns
 ) >nul 2>&1
 
-REM Clear Microsoft Store Cache & Exit program
+REM Clear Microsoft Store Cache & Exit App
 cls
 echo [==========                20.0%%                           ]
 (
@@ -257,12 +260,14 @@ del C:\Windows\debug /f /q /s
 for /d %%a in ("C:\Windows\debug\*.*") do rd /q /s "%%a"
 ) >nul 2>&1
 
-REM Clear Windows Prefetch
+REM Clear Windows Prefetch & Stop and disable Windows Search service
 cls
 echo [==========================80.0%%================           ]
 (
 del C:\Windows\Prefetch /f /q /s
 for /d %%a in ("C:\Windows\Prefetch\*.*") do rd /q /s "%%a"
+net stop WSearch
+sc config WSearch start= disabled
 ) >nul 2>&1
 
 REM Close Explorer
@@ -290,7 +295,7 @@ del %localappdata%\Microsoft\Windows\Explorer /f /q /s
 for /d %%a in ("%localappdata%\Microsoft\Windows\Explorer\*.*") do rd /q /s "%%a"
 ) >nul 2>&1
 
-REM Clear other Windows caches
+REM Clear other Windows caches & Windows Search database
 cls
 echo [==========================95.0%%=======================    ]
 (
@@ -298,6 +303,8 @@ del %localappdata%\Microsoft\Windows\Caches /f /q /s
 for /d %%a in ("%localappdata%\Microsoft\Windows\Caches\*.*") do rd /q /s "%%a"
 del C:\ProgramData\Microsoft\Windows\Caches /f /q /s
 for /d %%a in ("C:\ProgramData\Microsoft\Windows\Caches\*.*") do rd /q /s "%%a"
+del C:\ProgramData\Microsoft\Search /f /q /s
+for /d %%a in ("C:\ProgramData\Microsoft\Search\*.*") do rd /q /s "%%a"
 ) >nul 2>&1
 
 REM Open Explorer
