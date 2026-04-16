@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v2.3.1
+System TuneUp by Felixplored v2.4.0
 
 Version-History:
+v2.4.0  (2026-04-16) - Windows Defender Quick Scan and Windows MRT Quick Scan have been added to the repair options.
 v2.3.1  (2026-04-12) - CHCP has been removed to fix display errors involving umlauts and to improve global compatibility.
 v2.3.0  (2026-04-11) - Versioning changed; The "Windows Search" service is stopped, disabled and database is cleared;
                        Fixed "Restart" dialog box.

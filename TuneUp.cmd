@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v2.3.1
+title System TuneUp by Felixplored v2.4.0
 color 06
 
 REM Admin-Check
@@ -43,7 +43,7 @@ if %res% equ 6 (shutdown /r /t 60 & exit) else (exit)
 REM Open README
 :readme
 cls
-mode con: cols=184 lines=63
+mode con: cols=184 lines=64
 more "%~dp0README.txt"
 pause
 mode con: cols=120 lines=30
@@ -57,6 +57,16 @@ dism /Online /Cleanup-Image /RestoreHealth
 :: Run System File Checker
 cls
 sfc /scannow
+:: Run Windows Defender Quick Scan
+cls
+echo Windows Defender Quick Scan running...
+(
+"C:\Program Files\Windows Defender\MpCmdRun.exe" -Scan -ScanType 1
+) >nul 2>&1
+:: Run Windows MRT Quick Scan
+cls
+echo Windows MRT Quick Scan running...
+start /wait mrt /q
 :: Run Check Disk
 cls
 chkdsk C: /f
