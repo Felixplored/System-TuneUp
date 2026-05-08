@@ -1,6 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v2.4.0
-color 06
+title System TuneUp by Felixplored v2.4.1
 
 REM Admin-Check
 net session >nul 2>&1
@@ -43,7 +42,7 @@ if %res% equ 6 (shutdown /r /t 60 & exit) else (exit)
 REM Open README
 :readme
 cls
-mode con: cols=184 lines=64
+mode con: cols=184 lines=65
 more "%~dp0README.txt"
 pause
 mode con: cols=120 lines=30
