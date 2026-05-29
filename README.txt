@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v2.4.1
+System TuneUp by Felixplored v2.5.0
 
 Version-History:
+v2.5.0  (2026-05-29) - Added Dialog box to the Admin-Check; The presentation of important notes has been updated.
 v2.4.1  (2026-05-08) - CMD window color reset to default.
 v2.4.0  (2026-04-16) - Windows Defender Quick Scan and Windows MRT Quick Scan have been added to the repair options.
 v2.3.1  (2026-04-12) - CHCP has been removed to fix display errors involving umlauts and to improve global compatibility.
@@ -11,7 +12,7 @@ v2.2.0  (2026-04-10) - Set the encoding for the program and README back to "UTF-
 v2.1.0  (2026-04-09) - Added "Restart" dialog box.
 v2.0.0  (2026-04-08) - Program encoding changed to: "ANSI" & "Windows Command Script";
                        README encoding changed to: "ANSI"; Menu-Selection expanded.
-======================================================================================================================================================================================
+=====================================================================================================================================================================================
 v1.19.0 (2026-04-08) - The Menu-Selection has been expanded; Information dialog boxes added.  
 v1.18.0 (2026-04-07) - Added Menu-Selection.
 v1.17.0 (2026-04-06) - Removed unnecessary DISM commands & added a new DISM command to repair the Component Store;
