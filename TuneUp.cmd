@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v2.5.0
+title System TuneUp by Felixplored v2.6.0
 
 REM Admin-Check
 net session >nul 2>&1
@@ -41,7 +41,7 @@ if %res% equ 6 (shutdown /r /t 60 & exit) else (exit)
 REM Open README
 :readme
 cls
-mode con: cols=183 lines=66
+mode con: cols=183 lines=67
 more "%~dp0README.txt"
 pause
 mode con: cols=120 lines=30
@@ -100,6 +100,8 @@ dism /Online /Disable-Feature /Featurename:Recall
 
 REM Remove System Restore points & Disable System Restore on C:
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==                        5.0%%                            ]
 (
 vssadmin delete shadows /all /quiet
@@ -108,6 +110,8 @@ wmic /namespace:\\root\default path SystemRestore call Disable C:\
 
 REM Disable Quick Start & Hibernation
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [=====                     10.0%%                           ]
 (
 powercfg -h off
@@ -115,6 +119,8 @@ powercfg -h off
 
 REM Clear DNS Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [========                  15.0%%                           ]
 (
 ipconfig /flushdns
@@ -122,6 +128,8 @@ ipconfig /flushdns
 
 REM Clear Microsoft Store Cache & Exit App
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========                20.0%%                           ]
 (
 wsreset
@@ -130,14 +138,28 @@ taskkill /IM WinStore.App.exe /f /t
 
 REM Clear Windows Event Logs
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [=============             25.0%%                           ]
 (
 for /F "tokens=*" %%1 in ('wevtutil.exe el') DO wevtutil.exe cl "%%1"
 ) >nul 2>&1
 
+REM Stop and disable Windows Search service
+cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
+echo [================          30.0%%                           ]
+(
+net stop WSearch
+sc config WSearch start= disabled
+) >nul 2>&1
+
 REM Delete hidden Windows folders
 cls
-echo [================          30.0%%                           ]
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
+echo [==================        35.0%%                           ]
 (
 rd C:\$GetCurrent /q /s
 rd C:\$SysReset /q /s
@@ -149,20 +171,18 @@ rd C:\Recovery /q /s
 rd C:\Windows.old /q /s
 ) >nul 2>&1
 
-REM Clear Perflogs folder
-cls
-echo [==================        35.0%%                           ]
-(
-del C:\PerfLogs /f /q /s
-for /d %%a in ("C:\PerfLogs\*.*") do rd /q /s "%%a"
-) >nul 2>&1
-
 REM Clear AMD Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [=====================     40.0%%                           ]
 (
 del C:\.cache\AMD\DX9Cache /f /q /s
 for /d %%a in ("C:\.cache\AMD\DX9Cache\*.*") do rd /q /s "%%a"
+del C:\.cache\AMD\DxCache /f /q /s
+for /d %%a in ("C:\.cache\AMD\DxCache\*.*") do rd /q /s "%%a"
+del C:\.cache\AMD\DxcCache /f /q /s
+for /d %%a in ("C:\.cache\AMD\DxcCache\*.*") do rd /q /s "%%a"
 del %localappdata%\AMD\DX9Cache /f /q /s
 for /d %%a in ("%localappdata%\AMD\DX9Cache\*.*") do rd /q /s "%%a"
 del %localappdata%\AMD\DxCache /f /q /s
@@ -181,6 +201,8 @@ for /d %%a in ("%localappdata%low\AMD\DxcCache\*.*") do rd /q /s "%%a"
 
 REM Clear NVIDIA Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [=======================   45.0%%                           ]
 (
 del %localappdata%\NVIDIA\DXCache /f /q /s
@@ -199,6 +221,8 @@ for /d %%a in ("%appdata%\NVIDIA\ComputeCache\*.*") do rd /q /s "%%a"
 
 REM Clear D3DS Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================50.0%%                           ]
 (
 del %localappdata%\D3DSCache /f /q /s
@@ -207,6 +231,8 @@ for /d %%a in ("%localappdata%\D3DSCache\*.*") do rd /q /s "%%a"
 
 REM Clear Qt Shader Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================55.0%%==                         ]
 (
 del %localappdata%\cache /f /q /s
@@ -217,6 +243,8 @@ for /d %%a in ("%localappdata%\fontconfig\*.*") do rd /q /s "%%a"
 
 REM Clear Task Scheduler Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================60.0%%=====                      ]
 (
 del C:\Windows\SchCache /f /q /s
@@ -225,6 +253,8 @@ for /d %%a in ("C:\Windows\SchCache\*.*") do rd /q /s "%%a"
 
 REM Clear Windows Temps
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================65.0%%========                   ]
 (
 del %temp% /f /q /s
@@ -245,6 +275,8 @@ for /d %%a in ("C:\Windows\SoftwareDistribution\Download\*.*") do rd /q /s "%%a"
 
 REM Clear Windows CrashDumps
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================70.0%%==========                 ]
 (
 del %localappdata%\CrashDumps /f /q /s
@@ -259,22 +291,26 @@ for /d %%a in ("C:\Windows\Minidump\*.*") do rd /q /s "%%a"
 
 REM Clear Windows Logs
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================75.0%%=============              ]
 (
+del C:\PerfLogs /f /q /s
+for /d %%a in ("C:\PerfLogs\*.*") do rd /q /s "%%a"
 del C:\Windows\Logs /f /q /s
 for /d %%a in ("C:\Windows\Logs\*.*") do rd /q /s "%%a"
 del C:\Windows\debug /f /q /s
 for /d %%a in ("C:\Windows\debug\*.*") do rd /q /s "%%a"
 ) >nul 2>&1
 
-REM Clear Windows Prefetch & Stop and disable Windows Search service
+REM Clear Windows Prefetch
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================80.0%%================           ]
 (
 del C:\Windows\Prefetch /f /q /s
 for /d %%a in ("C:\Windows\Prefetch\*.*") do rd /q /s "%%a"
-net stop WSearch
-sc config WSearch start= disabled
 ) >nul 2>&1
 
 REM Close Explorer
@@ -289,6 +325,8 @@ if not errorlevel 1 (
 
 REM Clear Icon Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================85.0%%==================         ]
 (
 del %localappdata%\IconCache.db /a /f /q
@@ -296,6 +334,8 @@ del %localappdata%\IconCache.db /a /f /q
 
 REM Clear Thumbnail Cache
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================90.0%%=====================      ]
 (
 del %localappdata%\Microsoft\Windows\Explorer /f /q /s
@@ -304,6 +344,8 @@ for /d %%a in ("%localappdata%\Microsoft\Windows\Explorer\*.*") do rd /q /s "%%a
 
 REM Clear other Windows caches & Windows Search database
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================95.0%%=======================    ]
 (
 del %localappdata%\Microsoft\Windows\Caches /f /q /s
@@ -316,6 +358,8 @@ for /d %%a in ("C:\ProgramData\Microsoft\Search\*.*") do rd /q /s "%%a"
 
 REM Open Explorer
 cls
+echo (c) System TuneUp by Felixplored. All rights reserved.  
+echo.
 echo [==========================100.0%%==========================]
 start explorer.exe
 echo msgbox "Cleanup complete! A restart is recommended.",4160,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
