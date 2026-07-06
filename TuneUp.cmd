@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v2.6.0
+title System TuneUp by Felixplored v2.6.1
 
 REM Admin-Check
 net session >nul 2>&1
@@ -41,7 +41,7 @@ if %res% equ 6 (shutdown /r /t 60 & exit) else (exit)
 REM Open README
 :readme
 cls
-mode con: cols=183 lines=67
+mode con: cols=183 lines=68
 more "%~dp0README.txt"
 pause
 mode con: cols=120 lines=30
@@ -74,7 +74,7 @@ goto menu
 REM Windows Disk Cleanup
 :config
 :: Initial Setup: Set adjustment points
-echo msgbox "Please check ALL the boxes and click OK.",4144,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
+echo msgbox "Check ALL boxes and click OK.",4144,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
 cleanmgr /sageset:1
 goto menu
 :clean
@@ -82,9 +82,8 @@ goto menu
 cleanmgr /sagerun:1
 
 REM Windows Storage Sense
-echo msgbox "Then confirm by selecting Yes.",4144,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
 start ms-settings:storagesense
-echo msgbox "Click on: Temporary Files -> Check ALL boxes -> Remove Files -> Next. When finished, close the window.",4144,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
+echo msgbox "Click on: Temporary files -> Cleanup system files -> Confirm by selecting Yes -> Check ALL boxes -> Remove files -> Next. When finished, close the window.",4144,"System TuneUp by Felixplored">%temp%\i.vbs & wscript %temp%\i.vbs & del %temp%\i.vbs
 
 REM Run Defragmentation on C:
 cls

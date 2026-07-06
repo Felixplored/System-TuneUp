@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v2.6.0
+System TuneUp by Felixplored v2.6.1
 
 Version-History:
+v2.6.1  (2026-07-06) - Windows Disk Cleanup & Windows Storage Sense notes updated.
 v2.6.0  (2026-06-12) - Additional AMD caches have been added.
 v2.5.0  (2026-05-29) - Added Dialog box to the Admin-Check; The presentation of important notes has been updated.
 v2.4.1  (2026-05-08) - CMD window color reset to default.
