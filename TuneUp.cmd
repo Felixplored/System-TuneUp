@@ -1,5 +1,5 @@
 @echo off
-title System TuneUp by Felixplored v2.6.1
+title System TuneUp by Felixplored v2.7.0
 
 REM Admin-Check
 net session >nul 2>&1
@@ -41,7 +41,7 @@ if %res% equ 6 (shutdown /r /t 60 & exit) else (exit)
 REM Open README
 :readme
 cls
-mode con: cols=183 lines=68
+mode con: cols=183 lines=69
 more "%~dp0README.txt"
 pause
 mode con: cols=120 lines=30
@@ -206,16 +206,22 @@ echo [=======================   45.0%%                           ]
 (
 del %localappdata%\NVIDIA\DXCache /f /q /s
 for /d %%a in ("%localappdata%\NVIDIA\DXCache\*.*") do rd /q /s "%%a"
+del C:\Windows\System32\config\systemprofile\AppData\Local\NVIDIA\DXCache /f /q /s
+for /d %%a in ("C:\Windows\System32\config\systemprofile\AppData\Local\NVIDIA\DXCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\GLCache /f /q /s
 for /d %%a in ("%localappdata%\NVIDIA\GLCache\*.*") do rd /q /s "%%a"
 del %localappdata%\NVIDIA\OptixCache /f /q /s
 for /d %%a in ("%localappdata%\NVIDIA\OptixCache\*.*") do rd /q /s "%%a"
 del %localappdata%low\NVIDIA\DXCache /f /q /s
 for /d %%a in ("%localappdata%low\NVIDIA\DXCache\*.*") do rd /q /s "%%a"
+del C:\Windows\System32\config\systemprofile\AppData\LocalLow\NVIDIA\DXCache /f /q /s
+for /d %%a in ("C:\Windows\System32\config\systemprofile\AppData\LocalLow\NVIDIA\DXCache\*.*") do rd /q /s "%%a"
 del %localappdata%low\NVIDIA\PerDriverVersion\DXCache /f /q /s
 for /d %%a in ("%localappdata%low\NVIDIA\PerDriverVersion\DXCache\*.*") do rd /q /s "%%a"
 del %appdata%\NVIDIA\ComputeCache /f /q /s
 for /d %%a in ("%appdata%\NVIDIA\ComputeCache\*.*") do rd /q /s "%%a"
+del C:\Windows\System32\config\systemprofile\AppData\Roaming\NVIDIA\ComputeCache /f /q /s
+for /d %%a in ("C:\Windows\System32\config\systemprofile\AppData\Roaming\NVIDIA\ComputeCache\*.*") do rd /q /s "%%a"
 ) >nul 2>&1
 
 REM Clear D3DS Cache
@@ -226,6 +232,8 @@ echo [==========================50.0%%                           ]
 (
 del %localappdata%\D3DSCache /f /q /s
 for /d %%a in ("%localappdata%\D3DSCache\*.*") do rd /q /s "%%a"
+del C:\Windows\System32\config\systemprofile\AppData\Local\D3DSCache /f /q /s
+for /d %%a in ("C:\Windows\System32\config\systemprofile\AppData\Local\D3DSCache\*.*") do rd /q /s "%%a"
 ) >nul 2>&1
 
 REM Clear Qt Shader Cache
@@ -258,6 +266,8 @@ echo [==========================65.0%%========                   ]
 (
 del %temp% /f /q /s
 for /d %%a in ("%temp%\*.*") do rd /q /s "%%a"
+del C:\Windows\System32\config\systemprofile\AppData\Local\Temp /f /q /s
+for /d %%a in ("C:\Windows\System32\config\systemprofile\AppData\Local\Temp\*.*") do rd /q /s "%%a"
 del %localappdata%\SquirrelTemp /f /q /s
 for /d %%a in ("%localappdata%\SquirrelTemp\*.*") do rd /q /s "%%a"
 del %localappdata%low\Temp /f /q /s
@@ -280,6 +290,8 @@ echo [==========================70.0%%==========                 ]
 (
 del %localappdata%\CrashDumps /f /q /s
 for /d %%a in ("%localappdata%\CrashDumps\*.*") do rd /q /s "%%a"
+del C:\Windows\System32\config\systemprofile\AppData\Local\CrashDumps /f /q /s
+for /d %%a in ("C:\Windows\System32\config\systemprofile\AppData\Local\CrashDumps\*.*") do rd /q /s "%%a"
 del C:\ProgramData\Microsoft\Windows\WER /f /q /s
 for /d %%a in ("C:\ProgramData\Microsoft\Windows\WER\*.*") do rd /q /s "%%a"
 del C:\Windows\LiveKernelReports /f /q /s
@@ -347,6 +359,8 @@ echo (c) System TuneUp by Felixplored. All rights reserved.
 echo.
 echo [==========================95.0%%=======================    ]
 (
+del C:\Windows\System32\config\systemprofile\AppData\LocalLow\Microsoft\CryptnetUrlCache /f /q /s
+for /d %%a in ("C:\Windows\System32\config\systemprofile\AppData\LocalLow\Microsoft\CryptnetUrlCache\*.*") do rd /q /s "%%a"
 del %localappdata%\Microsoft\Windows\Caches /f /q /s
 for /d %%a in ("%localappdata%\Microsoft\Windows\Caches\*.*") do rd /q /s "%%a"
 del C:\ProgramData\Microsoft\Windows\Caches /f /q /s

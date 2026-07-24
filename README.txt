@@ -1,7 +1,8 @@
-System TuneUp by Felixplored v2.6.1
+System TuneUp by Felixplored v2.7.0
 
 Version-History:
-v2.6.1  (2026-07-06) - Windows Disk Cleanup & Windows Storage Sense notes updated.
+v2.7.0  (2026-07-24) - Additional temporary files, caches and crash dumps are now being cleaned up.
+v2.6.1  (2026-07-06) - Windows Disk Cleanup and Windows Storage Sense notes updated.
 v2.6.0  (2026-06-12) - Additional AMD caches have been added.
 v2.5.0  (2026-05-29) - Added Dialog box to the Admin-Check; The presentation of important notes has been updated.
 v2.4.1  (2026-05-08) - CMD window color reset to default.
@@ -12,15 +13,15 @@ v2.3.0  (2026-04-11) - Versioning changed; The "Windows Search" service is stopp
 v2.2.0  (2026-04-10) - Set the encoding for the program and README back to "UTF-8"; Switched the program and README to English;
                        The Menu-Selection is minimized.
 v2.1.0  (2026-04-09) - Added "Restart" dialog box.
-v2.0.0  (2026-04-08) - Program encoding changed to: "ANSI" & "Windows Command Script";
+v2.0.0  (2026-04-08) - Program encoding changed to: "ANSI" and "Windows Command Script";
                        README encoding changed to: "ANSI"; Menu-Selection expanded.
 =====================================================================================================================================================================================
 v1.19.0 (2026-04-08) - The Menu-Selection has been expanded; Information dialog boxes added.  
 v1.18.0 (2026-04-07) - Added Menu-Selection.
-v1.17.0 (2026-04-06) - Removed unnecessary DISM commands & added a new DISM command to repair the Component Store;
+v1.17.0 (2026-04-06) - Removed unnecessary DISM commands and added a new DISM command to repair the Component Store;
                        Added System File Checker; Added a repair prompt at the beginning of the command script.
 v1.16.0 (2026-04-05) - Added Progress bar.
-v1.15.0 (2026-04-04) - Quick Start & Hibernation will now be disabled; Explorer will now be closed and restarted before the Windows caches are cleared;
+v1.15.0 (2026-04-04) - Quick Start and Hibernation will now be disabled; Explorer will now be closed and restarted before the Windows caches are cleared;
                        The icon cache in Local AppData is now being cleaned up; The folder: "Microsoft\Windows\Caches" in ProgramData is now being cleaned up;
                        The Qt Shader Cache is now being cleaned up; Windows crash dumps are now being cleaned up and other logs, caches and temporary files are now being cleaned up.
 v1.14.0 (2026-04-03) - Added Admin-Check feature so that the batch always runs as an administrator;
