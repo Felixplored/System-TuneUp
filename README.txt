@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v3.0.0
+System TuneUp by Felixplored v3.0.1
 
 Version-History:
+v3.0.1  (2026-11-16) - Fixed a bug where the buttons could be pressed multiple times while the action was in progress.
 v3.0.0  (2026-11-14) - Program encoding changed to: "Windows PowerShell".
 =====================================================================================================================================================================================
 v2.7.0  (2026-07-24) - Additional temporary files, caches and crash dumps are now being cleaned up.

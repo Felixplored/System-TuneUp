@@ -18,6 +18,9 @@ public class Win32 {
 $script:TopMostHelper = New-Object System.Windows.Forms.Form
 $script:TopMostHelper.TopMost = $true
 
+# Global execution guard to prevent re-clicking active buttons
+$script:IsBusy = $false
+
 # Central function for foreground message boxes
 function Show-ForegroundMessage {
     param(
@@ -72,12 +75,14 @@ function Invoke-HiddenCommand {
     } catch { }
 }
 
-# Manages lock state, colors & borders for all buttons centrally
+# Manages lock state, colors, borders & click protection for all buttons centrally
 function Set-MenuState {
     param(
         [bool]$IsRunning,
         [System.Windows.Forms.Button]$ActiveButton = $null
     )
+
+    $script:IsBusy = $IsRunning
 
     $normalBg      = [System.Drawing.Color]::FromArgb(45, 45, 52)
     $exitBg        = [System.Drawing.Color]::FromArgb(140, 45, 45)
@@ -88,23 +93,32 @@ function Set-MenuState {
 
     foreach ($b in $allButtons) {
         if (-not $IsRunning) {
-            # Normal state: All active, standard color, standard border
+            # Normal state: All active, standard color, standard border, hand cursor
             $b.Enabled = $true
             $b.BackColor = if ($b -eq $btnExit) { $exitBg } else { $normalBg }
             $b.FlatAppearance.BorderSize = 1
             $b.FlatAppearance.BorderColor = $defaultBorder
+            $b.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::Empty
+            $b.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::Empty
+            $b.Cursor = [System.Windows.Forms.Cursors]::Hand
         } else {
-            # Execution state: Active button stays bright & white-bordered, rest turns gray
+            # Execution state: Active button stays bright & white-bordered, locked against clicks
             if ($b -eq $ActiveButton) {
+                $activeColor = if ($b -eq $btnExit) { $exitBg } else { $normalBg }
                 $b.Enabled = $true
-                $b.BackColor = if ($b -eq $btnExit) { $exitBg } else { $normalBg }
+                $b.BackColor = $activeColor
                 $b.FlatAppearance.BorderSize = 2
                 $b.FlatAppearance.BorderColor = [System.Drawing.Color]::White
+                # Prevent hover/click visual reaction while locked
+                $b.FlatAppearance.MouseOverBackColor = $activeColor
+                $b.FlatAppearance.MouseDownBackColor = $activeColor
+                $b.Cursor = [System.Windows.Forms.Cursors]::Default
             } else {
                 $b.Enabled = $false
                 $b.BackColor = $disabledColor
                 $b.FlatAppearance.BorderSize = 1
                 $b.FlatAppearance.BorderColor = $defaultBorder
+                $b.Cursor = [System.Windows.Forms.Cursors]::Default
             }
         }
     }
@@ -163,6 +177,7 @@ function Invoke-TaskQueue {
 # 3. Main Functions
 # ==========================================
 function Start-InitialSetup {
+    if ($script:IsBusy) { return }
     $tasks = @(
         @{
             Name = "Configure Disk Cleanup (cleanmgr)"
@@ -177,6 +192,7 @@ function Start-InitialSetup {
 }
 
 function Start-RepairPC {
+    if ($script:IsBusy) { return }
     $tasks = @(
         @{
             Name = "Repairing Component Store (DISM)"
@@ -215,6 +231,7 @@ function Start-RepairPC {
 }
 
 function Start-CleanupPC {
+    if ($script:IsBusy) { return }
     $tasks = @(
         @{
             Name = "Running Disk Cleanup"
@@ -440,6 +457,7 @@ function Start-CleanupPC {
 
 # --- Open README (Fullscreen) ---
 function Show-Readme {
+    if ($script:IsBusy) { return }
     Set-MenuState -IsRunning $true -ActiveButton $btnReadme
 
     $readmePath = Join-Path -Path $PSScriptRoot -ChildPath "README.txt"
@@ -479,6 +497,7 @@ function Show-Readme {
 
 # --- Exit ---
 function Invoke-ExitPrompt {
+    if ($script:IsBusy) { return }
     Set-MenuState -IsRunning $true -ActiveButton $btnExit
 
     $result = Show-ForegroundMessage -Message "Would you like to restart the system?" -Buttons YesNo -Icon Question -DefaultButton Button2
@@ -520,7 +539,7 @@ $lblTitle.TextAlign = "MiddleCenter"
 $form.Controls.Add($lblTitle)
 
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.Text = "by Felixplored | Ver.: v3.0.0"
+$lblSub.Text = "by Felixplored | Ver.: v3.0.1"
 $lblSub.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
 $lblSub.ForeColor = [System.Drawing.Color]::Silver
 $lblSub.AutoSize = $false
