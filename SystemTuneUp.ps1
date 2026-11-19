@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
-# Windows API to genuinely force foreground window focus
+# Windows API to force foreground focus, control system menu and enable window dragging anywhere
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
@@ -11,6 +11,20 @@ public class Win32 {
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool EnableMenuItem(IntPtr hMenu, uint uIDEnableItem, uint uEnable);
+
+    [DllImport("user32.dll")]
+    public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ReleaseCapture();
 }
 "@
 
@@ -18,7 +32,7 @@ public class Win32 {
 $script:TopMostHelper = New-Object System.Windows.Forms.Form
 $script:TopMostHelper.TopMost = $true
 
-# Global execution guard to prevent re-clicking active buttons
+# Global execution guard to prevent re-clicking active buttons or closing while busy
 $script:IsBusy = $false
 
 # Central function for foreground message boxes
@@ -75,7 +89,7 @@ function Invoke-HiddenCommand {
     } catch { }
 }
 
-# Manages lock state, colors, borders & click protection for all buttons centrally
+# Manages lock state, colors, dynamic active borders, click protection & window close (X) state centrally
 function Set-MenuState {
     param(
         [bool]$IsRunning,
@@ -85,33 +99,46 @@ function Set-MenuState {
     $script:IsBusy = $IsRunning
 
     $normalBg      = [System.Drawing.Color]::FromArgb(45, 45, 52)
-    $exitBg        = [System.Drawing.Color]::FromArgb(140, 45, 45)
     $disabledColor = [System.Drawing.Color]::FromArgb(35, 35, 40)
     $defaultBorder = [System.Drawing.Color]::FromArgb(70, 70, 80)
 
-    $allButtons = @($btnSetup, $btnRepair, $btnClean, $btnReadme, $btnExit)
+    $allButtons = @($btnSetup, $btnRepair, $btnClean, $btnReadme)
+
+    # Move focus away from buttons so Windows never draws a thick focus border
+    if ($form) { $form.ActiveControl = $lblTitle }
+
+    # Dynamically disable or enable the window's close (X) button via Win32 API
+    if ($form -and $form.Handle -ne [IntPtr]::Zero) {
+        $hMenu = [Win32]::GetSystemMenu($form.Handle, $false)
+        if ($hMenu -ne [IntPtr]::Zero) {
+            if ($IsRunning) {
+                [void][Win32]::EnableMenuItem($hMenu, 0xF060, 0x0001) # Gray out / disable X button
+            } else {
+                [void][Win32]::EnableMenuItem($hMenu, 0xF060, 0x0000) # Enable X button
+            }
+        }
+    }
 
     foreach ($b in $allButtons) {
         if (-not $IsRunning) {
-            # Normal state: All active, standard color, standard border, hand cursor
+            # Normal state: All active, standard color, uniform thin border, hand cursor
             $b.Enabled = $true
-            $b.BackColor = if ($b -eq $btnExit) { $exitBg } else { $normalBg }
+            $b.BackColor = $normalBg
             $b.FlatAppearance.BorderSize = 1
             $b.FlatAppearance.BorderColor = $defaultBorder
             $b.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::Empty
             $b.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::Empty
             $b.Cursor = [System.Windows.Forms.Cursors]::Hand
         } else {
-            # Execution state: Active button stays bright & white-bordered, locked against clicks
+            # Execution state: Active button gets prominent white border, rest dims & locks
             if ($b -eq $ActiveButton) {
-                $activeColor = if ($b -eq $btnExit) { $exitBg } else { $normalBg }
                 $b.Enabled = $true
-                $b.BackColor = $activeColor
+                $b.BackColor = $normalBg
                 $b.FlatAppearance.BorderSize = 2
                 $b.FlatAppearance.BorderColor = [System.Drawing.Color]::White
                 # Prevent hover/click visual reaction while locked
-                $b.FlatAppearance.MouseOverBackColor = $activeColor
-                $b.FlatAppearance.MouseDownBackColor = $activeColor
+                $b.FlatAppearance.MouseOverBackColor = $normalBg
+                $b.FlatAppearance.MouseDownBackColor = $normalBg
                 $b.Cursor = [System.Windows.Forms.Cursors]::Default
             } else {
                 $b.Enabled = $false
@@ -183,7 +210,7 @@ function Start-InitialSetup {
             Name = "Configure Disk Cleanup (cleanmgr)"
             Indeterminate = $true
             Action = {
-                Show-ForegroundMessage -Message "Check ALL boxes and click OK." -Icon Information
+                Show-ForegroundMessage -Message "Check ALL boxes and click OK." -Icon Warning
                 Start-Process "cleanmgr.exe" -ArgumentList "/sageset:1" -Wait
             }
         }
@@ -243,7 +270,7 @@ function Start-CleanupPC {
             Indeterminate = $false
             Action = {
                 Start-Process "ms-settings:storagesense"
-                Show-ForegroundMessage -Message "Click on: Temporary files -> Cleanup system files -> Confirm by selecting Yes -> Check ALL boxes -> Remove files -> Next. When finished, close the window." -Icon Information
+                Show-ForegroundMessage -Message "Click on: Temporary files -> Cleanup system files -> Confirm by selecting Yes -> Check ALL boxes -> Remove files -> Next. When finished, close the window and confirm the dialog with OK" -Icon Warning
             }
         },
         @{
@@ -495,27 +522,12 @@ function Show-Readme {
     Set-MenuState -IsRunning $false
 }
 
-# --- Exit ---
-function Invoke-ExitPrompt {
-    if ($script:IsBusy) { return }
-    Set-MenuState -IsRunning $true -ActiveButton $btnExit
-
-    $result = Show-ForegroundMessage -Message "Would you like to restart the system?" -Buttons YesNo -Icon Question -DefaultButton Button2
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
-        Start-Process "shutdown.exe" -ArgumentList "/r /t 60"
-    }
-    
-    # Closes the application in any case (whether Yes or No was clicked)
-    $form.Close()
-}
-
 # ==========================================
 # 4. Create User Interface (GUI)
 # ==========================================
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "System TuneUp by Felixplored"
-$form.Size = New-Object System.Drawing.Size(440, 485)
+$form.Size = New-Object System.Drawing.Size(440, 425)
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
@@ -526,7 +538,36 @@ $form.Add_Shown({
     $form.TopMost = $true
     [Win32]::SetForegroundWindow($form.Handle)
     $form.TopMost = $false
+    # Prevent default focus border on the first button at startup
+    $form.ActiveControl = $lblTitle
 })
+
+# Handle window close (X button): block completely while tasks are running, otherwise prompt and always close
+$form.Add_FormClosing({
+    param($sender, $e)
+    if ($script:IsBusy) {
+        $e.Cancel = $true
+        return
+    }
+
+    Set-MenuState -IsRunning $true
+    $result = Show-ForegroundMessage -Message "Would you like to restart the system?" -Buttons YesNo -Icon Question -DefaultButton Button2
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
+        Start-Process "shutdown.exe" -ArgumentList "/r /t 60"
+    }
+    # Leaving $e.Cancel untouched allows Windows Forms to close the window cleanly for both Yes and No
+})
+
+# Universal window dragging handler (allows moving the form by clicking anywhere on background/labels/progress bar)
+$enableDrag = {
+    param($sender, $e)
+    if ($e.Button -eq [System.Windows.Forms.MouseButtons]::Left) {
+        [Win32]::ReleaseCapture()
+        [void][Win32]::SendMessage($form.Handle, 0xA1, 2, 0) # WM_NCLBUTTONDOWN, HTCAPTION
+    }
+}
+$form.Add_MouseDown($enableDrag)
 
 $lblTitle = New-Object System.Windows.Forms.Label
 $lblTitle.Text = "System TuneUp"
@@ -536,16 +577,18 @@ $lblTitle.AutoSize = $false
 $lblTitle.Size = New-Object System.Drawing.Size(400, 35)
 $lblTitle.Location = New-Object System.Drawing.Point(12, 18)
 $lblTitle.TextAlign = "MiddleCenter"
+$lblTitle.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblTitle)
 
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.Text = "by Felixplored | Ver.: v3.0.1"
+$lblSub.Text = "by Felixplored | Ver.: v3.0.2"
 $lblSub.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
 $lblSub.ForeColor = [System.Drawing.Color]::Silver
 $lblSub.AutoSize = $false
 $lblSub.Size = New-Object System.Drawing.Size(400, 22)
 $lblSub.Location = New-Object System.Drawing.Point(12, 53)
 $lblSub.TextAlign = "MiddleCenter"
+$lblSub.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblSub)
 
 function New-MenuButton {
@@ -561,49 +604,50 @@ function New-MenuButton {
     $btn.ForeColor = [System.Drawing.Color]::White
     $btn.Font = New-Object System.Drawing.Font("Segoe UI", 10.5, [System.Drawing.FontStyle]::Bold)
     $btn.Cursor = [System.Windows.Forms.Cursors]::Hand
+    $btn.TabStop = $false
     return $btn
 }
 
-$btnBg     = [System.Drawing.Color]::FromArgb(45, 45, 52)
-$btnExitBg = [System.Drawing.Color]::FromArgb(140, 45, 45)
+$btnBg = [System.Drawing.Color]::FromArgb(45, 45, 52)
 
 $btnSetup  = New-MenuButton -Text "Initial Setup" -Y 95  -BgColor $btnBg
 $btnRepair = New-MenuButton -Text "Repair PC"     -Y 147 -BgColor $btnBg
 $btnClean  = New-MenuButton -Text "Cleanup PC"    -Y 199 -BgColor $btnBg
 $btnReadme = New-MenuButton -Text "Open README"   -Y 251 -BgColor $btnBg
-$btnExit   = New-MenuButton -Text "Exit"          -Y 303 -BgColor $btnExitBg
 
 $btnSetup.Add_Click({ Start-InitialSetup })
 $btnRepair.Add_Click({ Start-RepairPC })
 $btnClean.Add_Click({ Start-CleanupPC })
 $btnReadme.Add_Click({ Show-Readme })
-$btnExit.Add_Click({ Invoke-ExitPrompt })
 
-$form.Controls.AddRange(@($btnSetup, $btnRepair, $btnClean, $btnReadme, $btnExit))
+$form.Controls.AddRange(@($btnSetup, $btnRepair, $btnClean, $btnReadme))
 
 $lblStatus = New-Object System.Windows.Forms.Label
 $lblStatus.Text = "Ready."
 $lblStatus.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
 $lblStatus.ForeColor = [System.Drawing.Color]::LightGray
-$lblStatus.Location = New-Object System.Drawing.Point(45, 360)
+$lblStatus.Location = New-Object System.Drawing.Point(45, 308)
 $lblStatus.Size = New-Object System.Drawing.Size(335, 18)
+$lblStatus.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblStatus)
 
 $progressBar = New-Object System.Windows.Forms.ProgressBar
-$progressBar.Location = New-Object System.Drawing.Point(45, 382)
+$progressBar.Location = New-Object System.Drawing.Point(45, 330)
 $progressBar.Size = New-Object System.Drawing.Size(335, 18)
 $progressBar.Minimum = 0
 $progressBar.Maximum = 100
 $progressBar.Value = 0
+$progressBar.Add_MouseDown($enableDrag)
 $form.Controls.Add($progressBar)
 
 $lblCopyright = New-Object System.Windows.Forms.Label
 $lblCopyright.Text = "$([char]0x00A9) SystemTuneUp by Felixplored. All rights reserved."
 $lblCopyright.Font = New-Object System.Drawing.Font("Segoe UI", 7.5)
 $lblCopyright.ForeColor = [System.Drawing.Color]::Gray
-$lblCopyright.Location = New-Object System.Drawing.Point(45, 408)
+$lblCopyright.Location = New-Object System.Drawing.Point(45, 356)
 $lblCopyright.Size = New-Object System.Drawing.Size(335, 18)
 $lblCopyright.TextAlign = "MiddleCenter"
+$lblCopyright.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblCopyright)
 
 [void]$form.ShowDialog()

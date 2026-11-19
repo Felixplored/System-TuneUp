@@ -1,6 +1,8 @@
-System TuneUp by Felixplored v3.0.1
+System TuneUp by Felixplored v3.0.2
 
 Version-History:
+v3.0.2  (2026-11-19) - The Exit button and related features have been moved to the title bar; The appearance of the buttons has been standardized;
+                       Windows Storage Sense notes and icon updated; Initial Setup notes icon updated.
 v3.0.1  (2026-11-16) - Fixed a bug where the buttons could be pressed multiple times while the action was in progress.
 v3.0.0  (2026-11-14) - Program encoding changed to: "Windows PowerShell".
 =====================================================================================================================================================================================
@@ -29,7 +31,7 @@ v1.15.0 (2026-04-04) - Quick Start and Hibernation will now be disabled; Explore
                        The Qt Shader Cache is now being cleaned up; Windows crash dumps are now being cleaned up and other logs, caches and temporary files are now being cleaned up.
 v1.14.0 (2026-04-03) - Added Admin-Check feature so that the batch always runs as an administrator;
                        The command: "chkdsk" is now run with the parameter C: /f.
-v1.13.0 (2026-04-01) - Storage Sense is now being queried.
+v1.13.0 (2026-04-01) - Windows Storage Sense is now being queried.
 v1.12.0 (2026-03-30) - The D3DS cache in Local AppData is now being cleaned up; The Logs folder: "C:\Windows\Logs" is now being cleaned up;
                        The "Microsoft\Windows\Caches" folder in Local AppData is now being cleaned up.
 v1.11.0 (2026-03-28) - The "SquirrelTemp" folder in LocalAppData and the "Temp" folder in LocalLowAppData are now being cleaned up;
@@ -57,7 +59,7 @@ This ps1 file performs a repair or cleanup of your computer using built-in Windo
 1. Close all running programs before starting.
 2. Extract all files from the ZIP archive.
 3. Run "Start.cmd" as administrator.
-4. Follow the instructions in the UI and the dialogs.
+4. Follow the instructions in the GUI and the dialogs.
  
 Caution: 
 - The cleanup may take longer depending on your computer.
