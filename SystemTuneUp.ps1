@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
-# Windows API to force foreground focus, control system menu and enable window dragging anywhere
+# Windows API to force foreground focus, control system menu, enable window dragging and dark title bar
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
@@ -25,6 +25,9 @@ public class Win32 {
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool ReleaseCapture();
+
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 }
 "@
 
@@ -34,6 +37,12 @@ $script:TopMostHelper.TopMost = $true
 
 # Global execution guard to prevent re-clicking active buttons or closing while busy
 $script:IsBusy = $false
+
+# Progress bar state variables for custom centered percentage rendering
+$script:ProgressValue = 0
+$script:ProgressText  = ""
+$script:IsMarquee     = $false
+$script:MarqueePos    = 0
 
 # Central function for foreground message boxes
 function Show-ForegroundMessage {
@@ -45,6 +54,20 @@ function Show-ForegroundMessage {
         [System.Windows.Forms.MessageBoxDefaultButton]$DefaultButton = [System.Windows.Forms.MessageBoxDefaultButton]::Button1
     )
     return [System.Windows.Forms.MessageBox]::Show($script:TopMostHelper, $Message, $Title, $Buttons, $Icon, $DefaultButton)
+}
+
+function Enable-DarkTitleBar {
+    param([System.Windows.Forms.Form]$TargetForm)
+
+    if (-not $TargetForm -or $TargetForm.Handle -eq [IntPtr]::Zero) { return }
+
+    $darkMode = 1
+    $intSize = [System.Runtime.InteropServices.Marshal]::SizeOf([Type][int])
+    # 20 = DWMWA_USE_IMMERSIVE_DARK_MODE (Windows 10 20H1+ / Windows 11), 19 = older Windows 10 fallback
+    $result = [Win32]::DwmSetWindowAttribute($TargetForm.Handle, 20, [ref]$darkMode, $intSize)
+    if ($result -ne 0) {
+        [void][Win32]::DwmSetWindowAttribute($TargetForm.Handle, 19, [ref]$darkMode, $intSize)
+    }
 }
 
 # ==========================================
@@ -87,6 +110,23 @@ function Invoke-HiddenCommand {
             Start-Sleep -Milliseconds 100
         }
     } catch { }
+}
+
+function Update-ProgressDisplay {
+    param(
+        [int]$Value = 0,
+        [string]$Text = "",
+        [bool]$Marquee = $false
+    )
+    $script:ProgressValue = $Value
+    $script:ProgressText  = $Text
+    $script:IsMarquee     = $Marquee
+    if ($marqueeTimer) {
+        $marqueeTimer.Enabled = $Marquee
+    }
+    if ($pnlProgress) {
+        $pnlProgress.Invalidate()
+    }
 }
 
 # Manages lock state, colors, dynamic active borders, click protection & window close (X) state centrally
@@ -164,20 +204,16 @@ function Invoke-TaskQueue {
     $total = $Tasks.Count
     $current = 0
 
-    $progressBar.Style = "Blocks"
-    $progressBar.Minimum = 0
-    $progressBar.Maximum = 100
-    $progressBar.Value = 0
+    Update-ProgressDisplay -Value 0 -Text "0%" -Marquee $false
 
     foreach ($task in $Tasks) {
         $percentBefore = [math]::Round(($current / $total) * 100)
-        $lblStatus.Text = "[$($current + 1)/$total] $($task.Name) ($percentBefore%)"
+        $lblStatus.Text = "[$($current + 1)/$total] $($task.Name)"
         
         if ($task.Indeterminate) {
-            $progressBar.Style = "Marquee"
+            Update-ProgressDisplay -Value 0 -Text "" -Marquee $true
         } else {
-            $progressBar.Style = "Blocks"
-            $progressBar.Value = $percentBefore
+            Update-ProgressDisplay -Value $percentBefore -Text "$percentBefore%" -Marquee $false
         }
         [System.Windows.Forms.Application]::DoEvents()
 
@@ -185,9 +221,8 @@ function Invoke-TaskQueue {
 
         $current++
         $percentAfter = [math]::Round(($current / $total) * 100)
-        $progressBar.Style = "Blocks"
-        $progressBar.Value = $percentAfter
-        $lblStatus.Text = "[$current/$total] $($task.Name) ($percentAfter%)"
+        Update-ProgressDisplay -Value $percentAfter -Text "$percentAfter%" -Marquee $false
+        $lblStatus.Text = "[$current/$total] $($task.Name)"
         [System.Windows.Forms.Application]::DoEvents()
     }
 
@@ -195,8 +230,8 @@ function Invoke-TaskQueue {
         Show-ForegroundMessage -Message $CompletionMessage -Icon Information
     }
 
-    $progressBar.Value = 0
-    $lblStatus.Text = "Ready."
+    Update-ProgressDisplay -Value 0 -Text "" -Marquee $false
+    $lblStatus.Text = "Ready"
     Set-MenuState -IsRunning $false
 }
 
@@ -270,7 +305,7 @@ function Start-CleanupPC {
             Indeterminate = $false
             Action = {
                 Start-Process "ms-settings:storagesense"
-                Show-ForegroundMessage -Message "Click on: Temporary files -> Cleanup system files -> Confirm by selecting Yes -> Check ALL boxes -> Remove files -> Next. When finished, close the window and confirm the dialog with OK" -Icon Warning
+                Show-ForegroundMessage -Message "Click on: Temporary files -> Cleanup system files -> Confirm by selecting Yes -> Check ALL boxes -> Remove files -> Next.`n`nWhen finished, close the window and confirm with OK." -Icon Warning
             }
         },
         @{
@@ -500,6 +535,9 @@ function Show-Readme {
     $readmeForm.StartPosition = "CenterParent"
     $readmeForm.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
 
+    [void]$readmeForm.Handle
+    Enable-DarkTitleBar -TargetForm $readmeForm
+
     $textBox = New-Object System.Windows.Forms.TextBox
     $textBox.Multiline = $true
     $textBox.ReadOnly = $true
@@ -533,6 +571,9 @@ $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
 $form.BackColor = [System.Drawing.Color]::FromArgb(28, 28, 32)
 $form.ForeColor = [System.Drawing.Color]::White
+
+[void]$form.Handle
+Enable-DarkTitleBar -TargetForm $form
 
 $form.Add_Shown({
     $form.TopMost = $true
@@ -581,7 +622,7 @@ $lblTitle.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblTitle)
 
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.Text = "by Felixplored | Ver.: v3.0.2"
+$lblSub.Text = "by Felixplored | v3.0.3"
 $lblSub.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
 $lblSub.ForeColor = [System.Drawing.Color]::Silver
 $lblSub.AutoSize = $false
@@ -623,7 +664,7 @@ $btnReadme.Add_Click({ Show-Readme })
 $form.Controls.AddRange(@($btnSetup, $btnRepair, $btnClean, $btnReadme))
 
 $lblStatus = New-Object System.Windows.Forms.Label
-$lblStatus.Text = "Ready."
+$lblStatus.Text = "Ready"
 $lblStatus.Font = New-Object System.Drawing.Font("Segoe UI", 8.5)
 $lblStatus.ForeColor = [System.Drawing.Color]::LightGray
 $lblStatus.Location = New-Object System.Drawing.Point(45, 308)
@@ -631,14 +672,73 @@ $lblStatus.Size = New-Object System.Drawing.Size(335, 18)
 $lblStatus.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblStatus)
 
-$progressBar = New-Object System.Windows.Forms.ProgressBar
-$progressBar.Location = New-Object System.Drawing.Point(45, 330)
-$progressBar.Size = New-Object System.Drawing.Size(335, 18)
-$progressBar.Minimum = 0
-$progressBar.Maximum = 100
-$progressBar.Value = 0
-$progressBar.Add_MouseDown($enableDrag)
-$form.Controls.Add($progressBar)
+# Custom double-buffered progress bar with centered percentage text
+$pnlProgress = New-Object System.Windows.Forms.Panel
+$pnlProgress.Location = New-Object System.Drawing.Point(45, 330)
+$pnlProgress.Size = New-Object System.Drawing.Size(335, 18)
+$pnlProgress.BackColor = [System.Drawing.Color]::FromArgb(35, 35, 40)
+$pnlProgress.Add_MouseDown($enableDrag)
+
+# Enable DoubleBuffered on Panel to prevent any flickering
+$propDoubleBuffered = [System.Windows.Forms.Control].GetProperty("DoubleBuffered", [System.Reflection.BindingFlags]"Instance,NonPublic")
+$propDoubleBuffered.SetValue($pnlProgress, $true, $null)
+
+$marqueeTimer = New-Object System.Windows.Forms.Timer
+$marqueeTimer.Interval = 30
+$marqueeTimer.Add_Tick({
+    $script:MarqueePos += 5
+    if ($script:MarqueePos -gt $pnlProgress.Width) { $script:MarqueePos = -80 }
+    $pnlProgress.Invalidate()
+})
+
+$pnlProgress.Add_Paint({
+    param($sender, $e)
+    $g = $e.Graphics
+    $w = $sender.Width
+    $h = $sender.Height
+
+    $bgBrush     = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(35, 35, 40))
+    $fillBrush   = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(0, 174, 255))
+    $borderPen   = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(70, 70, 80), 1)
+
+    $g.FillRectangle($bgBrush, 0, 0, $w, $h)
+
+    if ($script:IsMarquee) {
+        $g.FillRectangle($fillBrush, $script:MarqueePos, 1, 80, $h - 2)
+    } else {
+        $fillWidth = [int](($w - 2) * ($script:ProgressValue / 100.0))
+        if ($fillWidth -gt 0) {
+            $g.FillRectangle($fillBrush, 1, 1, $fillWidth, $h - 2)
+        }
+    }
+
+    $g.DrawRectangle($borderPen, 0, 0, $w - 1, $h - 1)
+
+    if (-not [string]::IsNullOrEmpty($script:ProgressText)) {
+        $font = New-Object System.Drawing.Font("Segoe UI", 8, [System.Drawing.FontStyle]::Bold)
+        $sf = New-Object System.Drawing.StringFormat
+        $sf.Alignment = [System.Drawing.StringAlignment]::Center
+        $sf.LineAlignment = [System.Drawing.StringAlignment]::Center
+        $rect = New-Object System.Drawing.RectangleF(0, 0, $w, $h)
+
+        # Draw subtle dark shadow/outline so text stays crisp over both background and blue fill
+        $shadowBrush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(18, 18, 22))
+        $textBrush   = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::White)
+        $g.DrawString($script:ProgressText, $font, $shadowBrush, (New-Object System.Drawing.RectangleF(1, 1, $w, $h)), $sf)
+        $g.DrawString($script:ProgressText, $font, $textBrush, $rect, $sf)
+
+        $font.Dispose()
+        $sf.Dispose()
+        $shadowBrush.Dispose()
+        $textBrush.Dispose()
+    }
+
+    $bgBrush.Dispose()
+    $fillBrush.Dispose()
+    $borderPen.Dispose()
+})
+
+$form.Controls.Add($pnlProgress)
 
 $lblCopyright = New-Object System.Windows.Forms.Label
 $lblCopyright.Text = "$([char]0x00A9) SystemTuneUp by Felixplored. All rights reserved."
