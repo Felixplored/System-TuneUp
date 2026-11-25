@@ -1,6 +1,7 @@
-System TuneUp by Felixplored v3.0.3
+System TuneUp by Felixplored v3.1.0
 
 Version-History:
+v3.1.0  (2026-11-25) - Added logging; Split the "Open README" button into "README" and "LOG".
 v3.0.3  (2026-11-20) - Visual adjustments.
 v3.0.2  (2026-11-19) - The Exit button and related features have been moved to the title bar; The appearance of the buttons has been standardized;
                        Windows Storage Sense notes and icon updated; Initial Setup notes icon updated.

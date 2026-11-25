@@ -31,6 +31,34 @@ public class Win32 {
 }
 "@
 
+# Resolve script folder and log file path (SystemTuneUp.log next to SystemTuneUp.ps1)
+$script:ScriptDir = if (-not [string]::IsNullOrEmpty($PSScriptRoot)) {
+    $PSScriptRoot
+} elseif (-not [string]::IsNullOrEmpty($MyInvocation.MyCommand.Path)) {
+    Split-Path -Parent $MyInvocation.MyCommand.Path
+} else {
+    (Get-Location).Path
+}
+$script:LogFilePath = Join-Path -Path $script:ScriptDir -ChildPath "SystemTuneUp.log"
+$script:Utf8NoBom   = New-Object System.Text.UTF8Encoding($false)
+
+function Write-Log {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Message,
+        [ValidateSet("INFO", "WARN", "ERROR")]
+        [string]$Level = "INFO"
+    )
+    try {
+        $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss", [System.Globalization.CultureInfo]::InvariantCulture)
+        $line = "[$timestamp] [$Level] $Message" + [Environment]::NewLine
+        [System.IO.File]::AppendAllText($script:LogFilePath, $line, $script:Utf8NoBom)
+    } catch { }
+}
+
+# Create/initialize SystemTuneUp.log immediately on first run
+Write-Log -Message "=== System TuneUp v3.1.0 started ===" -Level "INFO"
+
 # Invisible helper window for perfectly forced foreground dialogs
 $script:TopMostHelper = New-Object System.Windows.Forms.Form
 $script:TopMostHelper.TopMost = $true
@@ -53,7 +81,12 @@ function Show-ForegroundMessage {
         [System.Windows.Forms.MessageBoxIcon]$Icon = [System.Windows.Forms.MessageBoxIcon]::Information,
         [System.Windows.Forms.MessageBoxDefaultButton]$DefaultButton = [System.Windows.Forms.MessageBoxDefaultButton]::Button1
     )
-    return [System.Windows.Forms.MessageBox]::Show($script:TopMostHelper, $Message, $Title, $Buttons, $Icon, $DefaultButton)
+    $cleanMsg = $Message -replace "(\r?\n)+", " | "
+    $buttonLabel = if ($Buttons -eq [System.Windows.Forms.MessageBoxButtons]::YesNo) { "Yes/No" } else { "$Buttons" }
+    Write-Log -Message "Dialog shown [$Icon | $buttonLabel]: $cleanMsg" -Level "INFO"
+    $res = [System.Windows.Forms.MessageBox]::Show($script:TopMostHelper, $Message, $Title, $Buttons, $Icon, $DefaultButton)
+    Write-Log -Message "Dialog result: $res" -Level "INFO"
+    return $res
 }
 
 function Enable-DarkTitleBar {
@@ -75,9 +108,11 @@ function Enable-DarkTitleBar {
 # ==========================================
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Log -Message "Administrator privileges missing. Exiting." -Level "WARN"
     Show-ForegroundMessage -Message "Please run as administrator!" -Icon Error
     exit
 }
+Write-Log -Message "Administrator privileges verified." -Level "INFO"
 
 # ==========================================
 # 2. Helper Functions & Invisible Task Engine
@@ -85,9 +120,12 @@ if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Adm
 function Clear-FolderContents {
     param([string]$Path)
     if (Test-Path -LiteralPath $Path) {
+        Write-Log -Message "Clearing folder contents: $Path" -Level "INFO"
         Get-ChildItem -LiteralPath $Path -Force -ErrorAction SilentlyContinue | ForEach-Object {
             Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
         }
+    } else {
+        Write-Log -Message "Folder not found (skipped): $Path" -Level "INFO"
     }
 }
 
@@ -96,6 +134,7 @@ function Invoke-HiddenCommand {
         [string]$FilePath,
         [string]$ArgumentList
     )
+    Write-Log -Message "Executing command: $FilePath $ArgumentList" -Level "INFO"
     try {
         $psi = New-Object System.Diagnostics.ProcessStartInfo
         $psi.FileName = $FilePath
@@ -109,7 +148,10 @@ function Invoke-HiddenCommand {
             [System.Windows.Forms.Application]::DoEvents()
             Start-Sleep -Milliseconds 100
         }
-    } catch { }
+        Write-Log -Message "Command finished (ExitCode=$($p.ExitCode)): $FilePath $ArgumentList" -Level "INFO"
+    } catch {
+        Write-Log -Message "Command failed ($FilePath $ArgumentList): $($_.Exception.Message)" -Level "ERROR"
+    }
 }
 
 function Update-ProgressDisplay {
@@ -142,7 +184,7 @@ function Set-MenuState {
     $disabledColor = [System.Drawing.Color]::FromArgb(35, 35, 40)
     $defaultBorder = [System.Drawing.Color]::FromArgb(70, 70, 80)
 
-    $allButtons = @($btnSetup, $btnRepair, $btnClean, $btnReadme)
+    $allButtons = @($btnSetup, $btnRepair, $btnClean, $btnReadme, $btnLog)
 
     # Move focus away from buttons so Windows never draws a thick focus border
     if ($form) { $form.ActiveControl = $lblTitle }
@@ -197,9 +239,11 @@ function Invoke-TaskQueue {
     param(
         [array]$Tasks,
         [string]$CompletionMessage,
-        [System.Windows.Forms.Button]$ActiveButton
+        [System.Windows.Forms.Button]$ActiveButton,
+        [string]$QueueName = "Task Queue"
     )
 
+    Write-Log -Message "Starting $QueueName ($($Tasks.Count) tasks)." -Level "INFO"
     Set-MenuState -IsRunning $true -ActiveButton $ActiveButton
     $total = $Tasks.Count
     $current = 0
@@ -209,6 +253,7 @@ function Invoke-TaskQueue {
     foreach ($task in $Tasks) {
         $percentBefore = [math]::Round(($current / $total) * 100)
         $lblStatus.Text = "[$($current + 1)/$total] $($task.Name)"
+        Write-Log -Message "Task [$($current + 1)/$total] started: $($task.Name)" -Level "INFO"
         
         if ($task.Indeterminate) {
             Update-ProgressDisplay -Value 0 -Text "" -Marquee $true
@@ -223,6 +268,7 @@ function Invoke-TaskQueue {
         $percentAfter = [math]::Round(($current / $total) * 100)
         Update-ProgressDisplay -Value $percentAfter -Text "$percentAfter%" -Marquee $false
         $lblStatus.Text = "[$current/$total] $($task.Name)"
+        Write-Log -Message "Task [$current/$total] completed ($percentAfter%): $($task.Name)" -Level "INFO"
         [System.Windows.Forms.Application]::DoEvents()
     }
 
@@ -233,6 +279,7 @@ function Invoke-TaskQueue {
     Update-ProgressDisplay -Value 0 -Text "" -Marquee $false
     $lblStatus.Text = "Ready"
     Set-MenuState -IsRunning $false
+    Write-Log -Message "Completed $QueueName." -Level "INFO"
 }
 
 # ==========================================
@@ -246,11 +293,12 @@ function Start-InitialSetup {
             Indeterminate = $true
             Action = {
                 Show-ForegroundMessage -Message "Check ALL boxes and click OK." -Icon Warning
+                Write-Log -Message "Launching cleanmgr.exe /sageset:1" -Level "INFO"
                 Start-Process "cleanmgr.exe" -ArgumentList "/sageset:1" -Wait
             }
         }
     )
-    Invoke-TaskQueue -Tasks $tasks -ActiveButton $btnSetup
+    Invoke-TaskQueue -Tasks $tasks -ActiveButton $btnSetup -QueueName "Initial Setup"
 }
 
 function Start-RepairPC {
@@ -273,6 +321,8 @@ function Start-RepairPC {
                 $defenderPath = "C:\Program Files\Windows Defender\MpCmdRun.exe"
                 if (Test-Path $defenderPath) {
                     Invoke-HiddenCommand $defenderPath "-Scan -ScanType 1"
+                } else {
+                    Write-Log -Message "MpCmdRun.exe not found (skipped)." -Level "WARN"
                 }
             }
         },
@@ -289,7 +339,7 @@ function Start-RepairPC {
             }
         }
     )
-    Invoke-TaskQueue -Tasks $tasks -CompletionMessage "Repair complete! A restart is recommended." -ActiveButton $btnRepair
+    Invoke-TaskQueue -Tasks $tasks -CompletionMessage "Repair complete! A restart is recommended." -ActiveButton $btnRepair -QueueName "Repair PC"
 }
 
 function Start-CleanupPC {
@@ -304,6 +354,7 @@ function Start-CleanupPC {
             Name = "Windows Storage Sense"
             Indeterminate = $false
             Action = {
+                Write-Log -Message "Opening Storage Sense settings (ms-settings:storagesense)." -Level "INFO"
                 Start-Process "ms-settings:storagesense"
                 Show-ForegroundMessage -Message "Click on: Temporary files -> Cleanup system files -> Confirm by selecting Yes -> Check ALL boxes -> Remove files -> Next.`n`nWhen finished, close the window and confirm with OK." -Icon Warning
             }
@@ -328,6 +379,7 @@ function Start-CleanupPC {
             Indeterminate = $false
             Action = {
                 Invoke-HiddenCommand "vssadmin.exe" "delete shadows /all /quiet"
+                Write-Log -Message "Disabling System Restore on C:\." -Level "INFO"
                 Disable-ComputerRestore -Drive "C:\" -ErrorAction SilentlyContinue
             }
         },
@@ -339,12 +391,16 @@ function Start-CleanupPC {
         @{
             Name = "Clearing DNS Cache"
             Indeterminate = $false
-            Action = { Clear-DnsClientCache -ErrorAction SilentlyContinue }
+            Action = {
+                Write-Log -Message "Clearing DNS client cache." -Level "INFO"
+                Clear-DnsClientCache -ErrorAction SilentlyContinue
+            }
         },
         @{
             Name = "Clearing Microsoft Store Cache"
             Indeterminate = $false
             Action = {
+                Write-Log -Message "Running wsreset.exe to clear Microsoft Store cache." -Level "INFO"
                 Start-Process "wsreset.exe" -WindowStyle Hidden
                 Start-Sleep -Seconds 2
                 Stop-Process -Name "WinStore.App" -Force -ErrorAction SilentlyContinue
@@ -354,6 +410,7 @@ function Start-CleanupPC {
             Name = "Clearing Windows Event Logs"
             Indeterminate = $false
             Action = {
+                Write-Log -Message "Clearing all Windows Event Logs via wevtutil.exe." -Level "INFO"
                 & wevtutil.exe el | ForEach-Object {
                     & wevtutil.exe cl "$_" 2>$null
                 }
@@ -363,6 +420,7 @@ function Start-CleanupPC {
             Name = "Stopping & disabling Windows Search"
             Indeterminate = $false
             Action = {
+                Write-Log -Message "Stopping and disabling Windows Search (WSearch) service." -Level "INFO"
                 Stop-Service -Name "WSearch" -Force -ErrorAction SilentlyContinue
                 Set-Service -Name "WSearch" -StartupType Disabled -ErrorAction SilentlyContinue
             }
@@ -377,6 +435,7 @@ function Start-CleanupPC {
                 )
                 foreach ($folder in $hiddenFolders) {
                     if (Test-Path -LiteralPath $folder) {
+                        Write-Log -Message "Deleting hidden Windows folder: $folder" -Level "INFO"
                         Remove-Item -LiteralPath $folder -Recurse -Force -ErrorAction SilentlyContinue
                     }
                 }
@@ -494,6 +553,7 @@ function Start-CleanupPC {
                 $localAppData = $env:LOCALAPPDATA
                 $iconCache = "$localAppData\IconCache.db"
                 if (Test-Path -LiteralPath $iconCache) {
+                    Write-Log -Message "Deleting IconCache.db: $iconCache" -Level "INFO"
                     Remove-Item -LiteralPath $iconCache -Force -ErrorAction SilentlyContinue
                 }
                 Clear-FolderContents "$localAppData\Microsoft\Windows\Explorer"
@@ -510,33 +570,43 @@ function Start-CleanupPC {
                     "C:\ProgramData\Microsoft\Search"
                 )
                 foreach ($p in $otherCaches) { Clear-FolderContents $p }
+                Write-Log -Message "Starting explorer.exe." -Level "INFO"
                 Start-Process "explorer.exe"
             }
         }
     )
-    Invoke-TaskQueue -Tasks $tasks -CompletionMessage "Cleanup complete! A restart is recommended." -ActiveButton $btnClean
+    Invoke-TaskQueue -Tasks $tasks -CompletionMessage "Cleanup complete! A restart is recommended." -ActiveButton $btnClean -QueueName "Cleanup PC"
 }
 
-# --- Open README (Fullscreen) ---
-function Show-Readme {
+# --- Open Text File Viewer (Fullscreen) ---
+function Show-TextViewer {
+    param(
+        [string]$FileName,
+        [string]$WindowTitle,
+        [System.Windows.Forms.Button]$ActiveButton,
+        [string]$LogLabel
+    )
     if ($script:IsBusy) { return }
-    Set-MenuState -IsRunning $true -ActiveButton $btnReadme
+    Write-Log -Message "Opening $LogLabel viewer." -Level "INFO"
+    Set-MenuState -IsRunning $true -ActiveButton $ActiveButton
 
-    $readmePath = Join-Path -Path $PSScriptRoot -ChildPath "README.txt"
-    $content = if (Test-Path -LiteralPath $readmePath) {
-        Get-Content -LiteralPath $readmePath -Raw -Encoding UTF8
+    $filePath = Join-Path -Path $script:ScriptDir -ChildPath $FileName
+    $content = if (Test-Path -LiteralPath $filePath) {
+        Write-Log -Message "Loaded $LogLabel from: $filePath" -Level "INFO"
+        Get-Content -LiteralPath $filePath -Raw -Encoding UTF8
     } else {
-        "README.txt not found in:`r`n$PSScriptRoot"
+        Write-Log -Message "$FileName not found in: $($script:ScriptDir)" -Level "WARN"
+        "$FileName not found in:`r`n$($script:ScriptDir)"
     }
 
-    $readmeForm = New-Object System.Windows.Forms.Form
-    $readmeForm.Text = "README - System TuneUp by Felixplored"
-    $readmeForm.WindowState = [System.Windows.Forms.FormWindowState]::Maximized
-    $readmeForm.StartPosition = "CenterParent"
-    $readmeForm.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
+    $viewerForm = New-Object System.Windows.Forms.Form
+    $viewerForm.Text = $WindowTitle
+    $viewerForm.WindowState = [System.Windows.Forms.FormWindowState]::Maximized
+    $viewerForm.StartPosition = "CenterParent"
+    $viewerForm.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
 
-    [void]$readmeForm.Handle
-    Enable-DarkTitleBar -TargetForm $readmeForm
+    [void]$viewerForm.Handle
+    Enable-DarkTitleBar -TargetForm $viewerForm
 
     $textBox = New-Object System.Windows.Forms.TextBox
     $textBox.Multiline = $true
@@ -549,15 +619,24 @@ function Show-Readme {
     $textBox.ForeColor = [System.Drawing.Color]::WhiteSmoke
     $textBox.Text = $content
 
-    $readmeForm.Controls.Add($textBox)
+    $viewerForm.Controls.Add($textBox)
 
-    $readmeForm.Add_Shown({
+    $viewerForm.Add_Shown({
         $textBox.Select(0, 0)
-        [void]$readmeForm.Focus()
+        [void]$viewerForm.Focus()
     })
 
-    [void]$readmeForm.ShowDialog()
+    [void]$viewerForm.ShowDialog()
     Set-MenuState -IsRunning $false
+    Write-Log -Message "Closed $LogLabel viewer." -Level "INFO"
+}
+
+function Show-Readme {
+    Show-TextViewer -FileName "README.txt" -WindowTitle "README - System TuneUp by Felixplored" -ActiveButton $btnReadme -LogLabel "README"
+}
+
+function Show-Log {
+    Show-TextViewer -FileName "SystemTuneUp.log" -WindowTitle "LOG - System TuneUp by Felixplored" -ActiveButton $btnLog -LogLabel "LOG"
 }
 
 # ==========================================
@@ -581,12 +660,14 @@ $form.Add_Shown({
     $form.TopMost = $false
     # Prevent default focus border on the first button at startup
     $form.ActiveControl = $lblTitle
+    Write-Log -Message "Main GUI displayed." -Level "INFO"
 })
 
 # Handle window close (X button): block completely while tasks are running, otherwise prompt and always close
 $form.Add_FormClosing({
     param($sender, $e)
     if ($script:IsBusy) {
+        Write-Log -Message "Window close blocked while task is running." -Level "WARN"
         $e.Cancel = $true
         return
     }
@@ -595,8 +676,12 @@ $form.Add_FormClosing({
     $result = Show-ForegroundMessage -Message "Would you like to restart the system?" -Buttons YesNo -Icon Question -DefaultButton Button2
 
     if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
+        Write-Log -Message "User confirmed restart (shutdown.exe /r /t 60)." -Level "INFO"
         Start-Process "shutdown.exe" -ArgumentList "/r /t 60"
+    } else {
+        Write-Log -Message "User declined restart." -Level "INFO"
     }
+    Write-Log -Message "=== System TuneUp v3.1.0 closed ===" -Level "INFO"
     # Leaving $e.Cancel untouched allows Windows Forms to close the window cleanly for both Yes and No
 })
 
@@ -622,7 +707,7 @@ $lblTitle.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblTitle)
 
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.Text = "by Felixplored | v3.0.3"
+$lblSub.Text = "by Felixplored | v3.1.0"
 $lblSub.Font = New-Object System.Drawing.Font("Segoe UI", 9.5)
 $lblSub.ForeColor = [System.Drawing.Color]::Silver
 $lblSub.AutoSize = $false
@@ -633,11 +718,17 @@ $lblSub.Add_MouseDown($enableDrag)
 $form.Controls.Add($lblSub)
 
 function New-MenuButton {
-    param([string]$Text, [int]$Y, [System.Drawing.Color]$BgColor)
+    param(
+        [string]$Text,
+        [int]$X = 45,
+        [int]$Y,
+        [int]$Width = 335,
+        [System.Drawing.Color]$BgColor
+    )
     $btn = New-Object System.Windows.Forms.Button
     $btn.Text = $Text
-    $btn.Location = New-Object System.Drawing.Point(45, $Y)
-    $btn.Size = New-Object System.Drawing.Size(335, 42)
+    $btn.Location = New-Object System.Drawing.Point($X, $Y)
+    $btn.Size = New-Object System.Drawing.Size($Width, 42)
     $btn.FlatStyle = "Flat"
     $btn.FlatAppearance.BorderSize = 1
     $btn.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 70, 80)
@@ -654,14 +745,16 @@ $btnBg = [System.Drawing.Color]::FromArgb(45, 45, 52)
 $btnSetup  = New-MenuButton -Text "Initial Setup" -Y 95  -BgColor $btnBg
 $btnRepair = New-MenuButton -Text "Repair PC"     -Y 147 -BgColor $btnBg
 $btnClean  = New-MenuButton -Text "Cleanup PC"    -Y 199 -BgColor $btnBg
-$btnReadme = New-MenuButton -Text "Open README"   -Y 251 -BgColor $btnBg
+$btnReadme = New-MenuButton -Text "README"        -X 45  -Y 251 -Width 162 -BgColor $btnBg
+$btnLog    = New-MenuButton -Text "LOG"           -X 218 -Y 251 -Width 162 -BgColor $btnBg
 
 $btnSetup.Add_Click({ Start-InitialSetup })
 $btnRepair.Add_Click({ Start-RepairPC })
 $btnClean.Add_Click({ Start-CleanupPC })
 $btnReadme.Add_Click({ Show-Readme })
+$btnLog.Add_Click({ Show-Log })
 
-$form.Controls.AddRange(@($btnSetup, $btnRepair, $btnClean, $btnReadme))
+$form.Controls.AddRange(@($btnSetup, $btnRepair, $btnClean, $btnReadme, $btnLog))
 
 $lblStatus = New-Object System.Windows.Forms.Label
 $lblStatus.Text = "Ready"
